@@ -21,7 +21,8 @@ periodik = {
     "Hg": 200.59, "Tl": 204.38, "Pb": 207.2, "Bi": 208.98, "Th": 232.04, "U": 238.03
 }
 
-# Fungsi parsing rumus dengan tanda kurung dan hidrasi
+# Fungsi parsing rumus
+
 def parse_formula(rumus):
     rumus = rumus.upper()
     rumus = re.sub(r'(\d+)([A-Z])', r'\1 \2', rumus)
@@ -55,16 +56,18 @@ def parse_formula(rumus):
         hasil[el] = hasil.get(el, 0) + 1
     return hasil
 
-# Fungsi pilih satuan volume (mL atau L)
 def konversi_volume(angka, satuan):
-    if satuan == "mL":
-        return angka / 1000
-    return angka
+    return angka / 1000 if satuan == "mL" else angka
 
-# Layout halaman
-menu = st.sidebar.radio("Navigasi", ["Penimbangan"])
+menu = st.sidebar.radio("Navigasi", ["Home", "Penimbangan", "Pengenceran", "Tentang Kami"])
 
-if menu == "Penimbangan":
+if menu == "Home":
+    st.title("Selamat Datang di COC")
+    st.write("Website ini dirancang untuk membantu menghitung konsentrasi larutan kimia secara mudah dan akurat.")
+    st.subheader("Tentang COC")
+    st.write("COC (Calculate of Concentration) adalah alat bantu interaktif berbasis web untuk perhitungan stoikiometri dan konsentrasi.")
+
+elif menu == "Penimbangan":
     st.title("Penimbangan Zat Kimia")
     senyawa = st.text_input("Masukkan rumus senyawa (misal: NaOH, CuSO4.5H2O, Fe(OH)3)")
     try:
@@ -106,3 +109,33 @@ if menu == "Penimbangan":
         st.success(f"Massa {senyawa.upper()} yang harus ditimbang: {hasil:.4f} g")
         with st.expander("Lihat Perhitungan"):
             st.code(penjelasan)
+
+elif menu == "Pengenceran":
+    st.title("Pengenceran Larutan")
+    metode = st.radio("Tentukan yang ingin dihitung:", ["Volume akhir", "Konsentrasi akhir"])
+    if metode == "Volume akhir":
+        c1 = st.number_input("Konsentrasi awal (C1)")
+        c2 = st.number_input("Konsentrasi yang diinginkan (C2)")
+        v1 = st.number_input("Volume awal (V1) dalam L")
+        if st.button("Hitung Volume Akhir"):
+            v2 = (c1 * v1) / c2 if c2 != 0 else 0
+            st.success(f"Volume akhir (V2) = {v2:.4f} L")
+    else:
+        v1 = st.number_input("Volume awal (V1) dalam L")
+        v2 = st.number_input("Volume akhir (V2) dalam L")
+        c1 = st.number_input("Konsentrasi awal (C1)")
+        if st.button("Hitung Konsentrasi Akhir"):
+            c2 = (c1 * v1) / v2 if v2 != 0 else 0
+            st.success(f"Konsentrasi akhir (C2) = {c2:.4f}")
+
+elif menu == "Tentang Kami":
+    st.title("Tentang Kami")
+    st.markdown("""
+    **Nama-nama Anggota Tim:**
+    
+    - Regant Tegar (NIM: 123456)
+    - Teman 1 (NIM: 123457)
+    - Teman 2 (NIM: 123458)
+    - Teman 3 (NIM: 123459)
+    """)
+
