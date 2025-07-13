@@ -24,7 +24,8 @@ periodik = {
 # Fungsi parsing rumus
 
 def parse_formula(rumus):
-    rumus = rumus.upper()
+    # Hapus baris yang mengubah ke kapital agar tetap case-sensitive
+    # rumus = rumus.upper()
     rumus = re.sub(r'(\d+)([A-Z])', r'\1 \2', rumus)
     def extract(tokens):
         stack = [[]]
@@ -56,85 +57,6 @@ def parse_formula(rumus):
         hasil[el] = hasil.get(el, 0) + 1
     return hasil
 
-def konversi_volume(angka, satuan):
-    return angka / 1000 if satuan == "mL" else angka
+# ... (kode lain tidak diubah, tetap sama)
 
-menu = st.sidebar.radio("Navigasi", ["Home", "Penimbangan", "Pengenceran", "Tentang Kami"])
-
-if menu == "Home":
-    st.title("Selamat Datang di COC")
-    st.write("Website ini dirancang untuk membantu menghitung konsentrasi larutan kimia secara mudah dan akurat.")
-    st.subheader("Tentang COC")
-    st.write("COC (Calculate of Concentration) adalah alat bantu interaktif berbasis web untuk perhitungan stoikiometri dan konsentrasi.")
-
-elif menu == "Penimbangan":
-    st.title("Penimbangan Zat Kimia")
-    senyawa = st.text_input("Masukkan rumus senyawa (misal: NaOH, CuSO4.5H2O, Fe(OH)3)")
-    try:
-        if senyawa:
-            mr = 0
-            komposisi = parse_formula(senyawa)
-            for el, jumlah in komposisi.items():
-                mr += periodik[el] * jumlah
-            mr = round(mr, 3)
-            st.success(f"Mr dari {senyawa.upper()} adalah {mr} g/mol")
-            with st.expander("Detail Atom"):
-                for el, jumlah in komposisi.items():
-                    st.write(f"{el}: {jumlah} × {periodik[el]} = {jumlah * periodik[el]:.3f}")
-    except Exception as e:
-        st.error(str(e))
-        mr = None
-
-    konsentrasi = st.number_input("Masukkan konsentrasi:")
-    satuan = st.selectbox("Pilih satuan konsentrasi:", ["Molaritas (g/mol)", "Normalitas (g/grek)", "% (b/v)", "PPM (mg/L)"])
-    volume_val = st.number_input("Masukkan volume larutan:")
-    volume_unit = st.selectbox("Pilih satuan volume:", ["mL", "L"])
-
-    def hitung_gram(mr, konsentrasi, volume_l, satuan):
-        if satuan == "Molaritas (g/mol)":
-            mol = konsentrasi * volume_l
-            return mol * mr, f"mol = {konsentrasi} × {volume_l} = {mol}\nMassa = {mol} × {mr} = {mol * mr} g"
-        elif satuan == "Normalitas (g/grek)":
-            grek = konsentrasi * volume_l
-            return grek * mr, f"grek = {konsentrasi} × {volume_l} = {grek}\nMassa = {grek} × {mr} = {grek * mr} g"
-        elif satuan == "% (b/v)":
-            return konsentrasi * volume_l * 10, f"Massa = {konsentrasi}% × {volume_l} L × 10 = {konsentrasi * volume_l * 10} g"
-        elif satuan == "PPM (mg/L)":
-            mg = konsentrasi * volume_l
-            return mg / 1000, f"Massa = {konsentrasi} mg/L × {volume_l} L = {mg} mg = {mg / 1000} g"
-
-    if st.button("Hitung Massa") and mr is not None:
-        volume_l = konversi_volume(volume_val, volume_unit)
-        hasil, penjelasan = hitung_gram(mr, konsentrasi, volume_l, satuan)
-        st.success(f"Massa {senyawa.upper()} yang harus ditimbang: {hasil:.4f} g")
-        with st.expander("Lihat Perhitungan"):
-            st.code(penjelasan)
-
-elif menu == "Pengenceran":
-    st.title("Pengenceran Larutan")
-    metode = st.radio("Tentukan yang ingin dihitung:", ["Volume akhir", "Konsentrasi akhir"])
-    if metode == "Volume akhir":
-        c1 = st.number_input("Konsentrasi awal (C1)")
-        c2 = st.number_input("Konsentrasi yang diinginkan (C2)")
-        v1 = st.number_input("Volume awal (V1) dalam L")
-        if st.button("Hitung Volume Akhir"):
-            v2 = (c1 * v1) / c2 if c2 != 0 else 0
-            st.success(f"Volume akhir (V2) = {v2:.4f} L")
-    else:
-        v1 = st.number_input("Volume awal (V1) dalam L")
-        v2 = st.number_input("Volume akhir (V2) dalam L")
-        c1 = st.number_input("Konsentrasi awal (C1)")
-        if st.button("Hitung Konsentrasi Akhir"):
-            c2 = (c1 * v1) / v2 if v2 != 0 else 0
-            st.success(f"Konsentrasi akhir (C2) = {c2:.4f}")
-
-elif menu == "Tentang Kami":
-    st.title("Tentang Kami")
-    st.markdown("""
-    **Nama-nama Anggota Tim:**
-    
-    - Regant Tegar (NIM: 123456)
-    - Teman 1 (NIM: 123457)
-    - Teman 2 (NIM: 123458)
-    - Teman 3 (NIM: 123459)
-    """)
+# Sisanya lanjut seperti yang sudah ada di dokumen kamu
