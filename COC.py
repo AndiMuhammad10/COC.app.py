@@ -25,6 +25,9 @@ periodik = {
 
 def parse_formula(rumus):
     rumus = rumus.strip()
+    if not rumus:
+        return {}
+
     def extract(tokens):
         stack = [[]]
         i = 0
@@ -46,11 +49,15 @@ def parse_formula(rumus):
             i += 1
         return stack[0]
 
-    tokens = re.findall(r'[A-Z][a-z]?|\d+|\(|\)', rumus)
-    elements = extract(tokens)
-    hasil = {}
-    for el in elements:
-        if el not in periodik:
-            raise ValueError(f"Elemen tidak dikenali: {el}")
-        hasil[el] = hasil.get(el, 0) + 1
-    return hasil
+    try:
+        tokens = re.findall(r'[A-Z][a-z]?|\d+|\(|\)', rumus)
+        elements = extract(tokens)
+        hasil = {}
+        for el in elements:
+            if el not in periodik:
+                raise ValueError(f"Elemen tidak dikenali: {el}")
+            hasil[el] = hasil.get(el, 0) + 1
+        return hasil
+    except Exception as e:
+        st.error(f"Terjadi kesalahan saat parsing rumus: {str(e)}")
+        return {}
