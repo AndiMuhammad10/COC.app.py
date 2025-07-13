@@ -24,7 +24,7 @@ periodik = {
 # Fungsi parsing rumus dengan tanda kurung dan hidrasi
 def parse_formula(rumus):
     rumus = rumus.upper()
-    rumus = re.sub(r'(\d+)([A-Z])', r'\1 \2', rumus)  # tambahkan spasi agar tidak campur digit & huruf baru
+    rumus = re.sub(r'(\d+)([A-Z])', r'\1 \2', rumus)
     def extract(tokens):
         stack = [[]]
         i = 0
@@ -55,25 +55,54 @@ def parse_formula(rumus):
         hasil[el] = hasil.get(el, 0) + 1
     return hasil
 
-# Fungsi baru: pilih satuan volume (mL atau L)
+# Fungsi pilih satuan volume (mL atau L)
 def konversi_volume(angka, satuan):
     if satuan == "mL":
         return angka / 1000
     return angka
 
-# Update bagian input volume
-    
-# Di bagian "Penimbangan"
-    # volume_ml = st.number_input("Masukkan volume larutan (dalam mL):")
-    # Ganti menjadi:
+# Layout halaman
+menu = st.sidebar.radio("Navigasi", ["Penimbangan"])
+
+if menu == "Penimbangan":
+    st.title("Penimbangan Zat Kimia")
+    senyawa = st.text_input("Masukkan rumus senyawa (misal: NaOH, CuSO4.5H2O, Fe(OH)3)")
+    try:
+        if senyawa:
+            mr = 0
+            komposisi = parse_formula(senyawa)
+            for el, jumlah in komposisi.items():
+                mr += periodik[el] * jumlah
+            mr = round(mr, 3)
+            st.success(f"Mr dari {senyawa.upper()} adalah {mr} g/mol")
+            with st.expander("Detail Atom"):
+                for el, jumlah in komposisi.items():
+                    st.write(f"{el}: {jumlah} × {periodik[el]} = {jumlah * periodik[el]:.3f}")
+    except Exception as e:
+        st.error(str(e))
+        mr = None
+
+    konsentrasi = st.number_input("Masukkan konsentrasi:")
+    satuan = st.selectbox("Pilih satuan konsentrasi:", ["Molaritas (g/mol)", "Normalitas (g/grek)", "% (b/v)", "PPM (mg/L)"])
     volume_val = st.number_input("Masukkan volume larutan:")
     volume_unit = st.selectbox("Pilih satuan volume:", ["mL", "L"])
+
+    def hitung_gram(mr, konsentrasi, volume_l, satuan):
+        if satuan == "Molaritas (g/mol)":
+            mol = konsentrasi * volume_l
+            return mol * mr, f"mol = {konsentrasi} × {volume_l} = {mol}\nMassa = {mol} × {mr} = {mol * mr} g"
+        elif satuan == "Normalitas (g/grek)":
+            grek = konsentrasi * volume_l
+            return grek * mr, f"grek = {konsentrasi} × {volume_l} = {grek}\nMassa = {grek} × {mr} = {grek * mr} g"
+        elif satuan == "% (b/v)":
+            return konsentrasi * volume_l * 10, f"Massa = {konsentrasi}% × {volume_l} L × 10 = {konsentrasi * volume_l * 10} g"
+        elif satuan == "PPM (mg/L)":
+            mg = konsentrasi * volume_l
+            return mg / 1000, f"Massa = {konsentrasi} mg/L × {volume_l} L = {mg} mg = {mg / 1000} g"
 
     if st.button("Hitung Massa") and mr is not None:
         volume_l = konversi_volume(volume_val, volume_unit)
         hasil, penjelasan = hitung_gram(mr, konsentrasi, volume_l, satuan)
-        st.success(f"Massa {senyawa} yang harus ditimbang: {hasil:.4f} g")
+        st.success(f"Massa {senyawa.upper()} yang harus ditimbang: {hasil:.4f} g")
         with st.expander("Lihat Perhitungan"):
             st.code(penjelasan)
-
-# Sisanya tetap sama
