@@ -1,11 +1,31 @@
 import streamlit as st
+import re
 
 st.set_page_config(page_title="COC - Calculate Of Concentration", layout="wide")
 
-# Sidebar navigation
-menu = st.sidebar.radio("Navigasi", ["Home", "Penimbangan", "Pengenceran", "Tentang Kami"])
+# Tabel Periodik Sederhana
+periodik = {
+    "H": 1.008, "He": 4.003, "Li": 6.941, "Be": 9.012, "B": 10.81, "C": 12.01,
+    "N": 14.01, "O": 16.00, "F": 19.00, "Ne": 20.18, "Na": 22.99, "Mg": 24.31,
+    "Al": 26.98, "Si": 28.09, "P": 30.97, "S": 32.07, "Cl": 35.45, "Ar": 39.95,
+    "K": 39.10, "Ca": 40.08, "Mn": 54.94, "Fe": 55.85, "Cu": 63.55, "Zn": 65.38,
+    "Br": 79.90, "Ag": 107.87, "I": 126.90, "Ba": 137.33, "Hg": 200.59, "Pb": 207.2
+}
+
+# Fungsi untuk parsing rumus kimia
+def hitung_mr(senyawa):
+    pattern = r"([A-Z][a-z]?)(\d*)"
+    matches = re.findall(pattern, senyawa)
+    mr = 0
+    for elemen, jumlah in matches:
+        if elemen not in periodik:
+            raise ValueError(f"Elemen tidak dikenali: {elemen}")
+        jumlah = int(jumlah) if jumlah else 1
+        mr += periodik[elemen] * jumlah
+    return round(mr, 3)
 
 # Fungsi menghitung massa dari konsentrasi
+
 def hitung_gram(mr, konsentrasi, volume_l, satuan):
     if satuan == "Molaritas (g/mol)":
         mol = konsentrasi * volume_l
@@ -20,11 +40,15 @@ def hitung_gram(mr, konsentrasi, volume_l, satuan):
         return mg / 1000, f"Massa = {konsentrasi} mg/L × {volume_l} L = {mg} mg = {mg / 1000} g"
 
 # Fungsi pengenceran
+
 def hitung_pengenceran(v1=None, c1=None, v2=None, c2=None):
     if v1 is None:
         return (v2 * c2) / c1, f"V1 = (V2 × C2) / C1 = ({v2} × {c2}) / {c1} = {(v2 * c2) / c1}"
     elif c1 is None:
         return (v2 * c2) / v1, f"C1 = (V2 × C2) / V1 = ({v2} × {c2}) / {v1} = {(v2 * c2) / v1}"
+
+# Sidebar navigation
+menu = st.sidebar.radio("Navigasi", ["Home", "Penimbangan", "Pengenceran", "Tentang Kami"])
 
 # Tampilan halaman
 if menu == "Home":
@@ -40,13 +64,20 @@ if menu == "Home":
 
 elif menu == "Penimbangan":
     st.header("Penimbangan Zat")
-    senyawa = st.text_input("Masukkan nama senyawa (contoh: NaOH, KMnO4)")
-    mr = st.number_input("Masukkan Mr senyawa tersebut:", min_value=1.0)
+    senyawa = st.text_input("Masukkan rumus kimia senyawa (contoh: NaOH, KMnO4, CuSO45H2O)")
+    try:
+        if senyawa:
+            mr = hitung_mr(senyawa)
+            st.success(f"Mr dari {senyawa} adalah {mr} g/mol")
+    except Exception as e:
+        st.error(str(e))
+        mr = None
+
     konsentrasi = st.number_input("Masukkan konsentrasi yang diinginkan:")
     satuan = st.selectbox("Pilih satuan konsentrasi:", ["Molaritas (g/mol)", "Normalitas (g/grek)", "% (b/v)", "PPM (mg/L)"])
     volume_ml = st.number_input("Masukkan volume larutan (dalam mL):")
 
-    if st.button("Hitung Massa"):
+    if st.button("Hitung Massa") and mr is not None:
         volume_l = volume_ml / 1000
         hasil, penjelasan = hitung_gram(mr, konsentrasi, volume_l, satuan)
         st.success(f"Massa {senyawa} yang harus ditimbang: {hasil:.4f} g")
