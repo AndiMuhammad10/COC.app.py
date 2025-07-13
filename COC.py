@@ -101,7 +101,7 @@ if menu == "Home":
 
 elif menu == "Penimbangan":
     st.header("Penimbangan Zat")
-    senyawa = st.text_input("Masukkan rumus kimia senyawa (contoh: K2Cr2O7, Fe(OH)3, CuSO4.5H2O)")
+    senyawa = st.text_input("Masukkan rumus kimia senyawa (contoh: K2Cr2O7, Fe(OH)3, CuSO4.(H2O)5")
     try:
         if senyawa:
             mr, detail = hitung_mr(senyawa)
