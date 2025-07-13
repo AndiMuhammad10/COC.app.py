@@ -24,9 +24,7 @@ periodik = {
 # Fungsi parsing rumus
 
 def parse_formula(rumus):
-    # Hapus baris yang mengubah ke kapital agar tetap case-sensitive
-    # rumus = rumus.upper()
-    rumus = re.sub(r'(\d+)([A-Z])', r'\1 \2', rumus)
+    rumus = rumus.strip()
     def extract(tokens):
         stack = [[]]
         i = 0
@@ -56,7 +54,3 @@ def parse_formula(rumus):
             raise ValueError(f"Elemen tidak dikenali: {el}")
         hasil[el] = hasil.get(el, 0) + 1
     return hasil
-
-# ... (kode lain tidak diubah, tetap sama)
-
-# Sisanya lanjut seperti yang sudah ada di dokumen kamu
