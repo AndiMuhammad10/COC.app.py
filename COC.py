@@ -24,10 +24,7 @@ periodik = {
 # Fungsi parsing rumus
 
 def parse_formula(rumus):
-    rumus = rumus.strip()
-    if not rumus:
-        return {}
-
+    rumus = rumus.upper()  # KEMBALI KE VERSI SEBELUMNYA YANG MENGUBAH SEMUA KE KAPITAL
     def extract(tokens):
         stack = [[]]
         i = 0
