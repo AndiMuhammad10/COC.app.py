@@ -138,4 +138,3 @@ elif menu == "Tentang Kami":
     - Teman 2 (NIM: 123458)
     - Teman 3 (NIM: 123459)
     """)
-
