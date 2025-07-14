@@ -67,6 +67,22 @@ periodik = {
     "Hg": 200.59, "Tl": 204.38, "Pb": 207.2, "Bi": 208.98, "Th": 232.04, "U": 238.03
 }
 
+# Common compounds for automatic equivalent weight determination
+common_compounds = {
+    "HCl": {"type": "acid", "H+": 1},
+    "H2SO4": {"type": "acid", "H+": 2},
+    "HNO3": {"type": "acid", "H+": 1},
+    "H3PO4": {"type": "acid", "H+": 3},
+    "CH3COOH": {"type": "acid", "H+": 1},
+    "NaOH": {"type": "base", "OH-": 1},
+    "KOH": {"type": "base", "OH-": 1},
+    "Ca(OH)2": {"type": "base", "OH-": 2},
+    "Ba(OH)2": {"type": "base", "OH-": 2},
+    "Na2CO3": {"type": "salt", "n": 2, "charge": 2},
+    "K2Cr2O7": {"type": "redox", "n": 6},  # Example for redox reactions
+    "KMnO4": {"type": "redox", "n": 5},    # Example for redox reactions
+}
+
 # Fungsi parsing rumus dengan tanda kurung dan hidrasi
 def parse_formula(rumus):
     def extract(tokens):
@@ -172,16 +188,16 @@ elif menu == "Penimbangan":
 
     if st.button("Hitung Massa") and mr is not None:
         volume_l = volume_ml / 1000
+        berat_ekivalen = None
+        
         if satuan == "Normalitas (g/grek)":
             # Automatically calculate equivalent weight based on the compound type
             if senyawa in common_compounds:
-                berat_ekivalen = common_compounds[senyawa]["H+"]  # Example for acids
+                # Assuming the equivalent weight is based on the number of H+ ions for acids
+                berat_ekivalen = common_compounds[senyawa]["H+"]
             else:
                 st.error("Berat ekivalen tidak ditemukan untuk senyawa ini.")
-                berat_ekivalen = None
-        else:
-            berat_ekivalen = None
-
+        
         hasil, penjelasan = hitung_gram(mr, konsentrasi, volume_l, satuan, berat_ekivalen)
         st.success(f"Massa {senyawa} yang harus ditimbang: {hasil:.4f} g")
         with st.expander("Lihat Perhitungan"):
@@ -233,7 +249,12 @@ elif menu == "Konversi":
 
     if st.button("Konversi"):
         # Implement conversion logic here
-        st.success("Konversi berhasil!")  # Placeholder for actual conversion result
+        if from_unit == to_unit:
+            st.warning("Anda memilih satuan yang sama!")
+        else:
+            # Placeholder for actual conversion logic
+            result = value  # Replace with actual conversion logic
+            st.success(f"Hasil konversi: {value} {from_unit} = {result:.4f} {to_unit}")
 
     if st.button("Beranda"):
         st.experimental_rerun()
