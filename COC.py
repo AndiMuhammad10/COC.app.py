@@ -145,4 +145,32 @@ if menu == "Penimbangan":
     satuan = st.selectbox("Pilih satuan konsentrasi:", ["Molaritas (g/mol)", "Normalitas (g/grek)", "% (b/v)", "PPM (mg/L)"])
     volume_ml = st.number_input("Masukkan volume larutan (dalam mL):")
 
-    if st.button("
+    if st.button("Hitung Massa"):
+        if mr is None:
+            st.error("Masukkan rumus senyawa yang valid terlebih dahulu")
+            st.stop()
+        
+        volume_l = volume_ml / 1000
+        
+        if satuan == "Normalitas (g/grek)":
+            if senyawa in common_compounds:
+                hasil, penjelasan = hitung_gram(mr, konsentrasi, volume_l, satuan, common_compounds[senyawa]["be"])
+            else:
+                st.error("Tidak dapat menghitung Normalitas: berat ekivalen tidak diketahui")
+                st.stop()
+        else:
+            hasil, penjelasan = hitung_gram(mr, konsentrasi, volume_l, satuan)
+        
+        st.success(f"Massa {senyawa} yang harus ditimbang: {hasil:.4f} g")
+        with st.expander("Lihat Perhitungan"):
+            st.code(penjelasan)
+
+    if st.button("Kembali ke Beranda"):
+        st.experimental_rerun()
+
+elif menu == "Pengenceran":
+    st.header("Pengenceran Larutan")
+    pilihan = st.radio("Ingin menentukan apa?", ["Volume Awal (V1)", "Konsentrasi Awal (C1)"])
+    
+    if pilihan == "Volume Awal (V1)":
+        c1 = st.number_input("Masukkan Konsentrasi Awal (C1):")
