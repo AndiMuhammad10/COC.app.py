@@ -10,7 +10,7 @@ st.markdown(
     @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
     
     body {
-        background: linear-gradient(135deg, #4B0082, #8A2BE2);
+        background: linear-gradient(135deg, #5C4B8A, #8A2BE2);
         background-size: 400% 400%;
         animation: gradient 15s ease infinite;
         color: white;
@@ -154,8 +154,7 @@ if menu == "Home":
 elif menu == "Penimbangan":
     st.header("Penimbangan Zat")
     senyawa = st.text_input("Masukkan rumus kimia senyawa (contoh: K2Cr2O7, Fe(OH)3, CuSO4.(H2O)5")
-    berat_ekivalen = st.number_input("Masukkan Berat Ekivalen (g/grek) jika menggunakan Normalitas:", min_value=0.0)
-
+    
     try:
         if senyawa:
             mr, detail = hitung_mr(senyawa)
@@ -173,7 +172,17 @@ elif menu == "Penimbangan":
 
     if st.button("Hitung Massa") and mr is not None:
         volume_l = volume_ml / 1000
-        hasil, penjelasan = hitung_gram(mr, konsentrasi, volume_l, satuan, berat_ekivalen if satuan == "Normalitas (g/grek)" else None)
+        if satuan == "Normalitas (g/grek)":
+            # Automatically calculate equivalent weight based on the compound type
+            if senyawa in common_compounds:
+                berat_ekivalen = common_compounds[senyawa]["H+"]  # Example for acids
+            else:
+                st.error("Berat ekivalen tidak ditemukan untuk senyawa ini.")
+                berat_ekivalen = None
+        else:
+            berat_ekivalen = None
+
+        hasil, penjelasan = hitung_gram(mr, konsentrasi, volume_l, satuan, berat_ekivalen)
         st.success(f"Massa {senyawa} yang harus ditimbang: {hasil:.4f} g")
         with st.expander("Lihat Perhitungan"):
             st.code(penjelasan)
@@ -204,6 +213,9 @@ elif menu == "Pengenceran":
             with st.expander("Lihat Perhitungan"):
                 st.code(penjelasan)
 
+    if st.button("Beranda"):
+        st.experimental_rerun()
+
 elif menu == "Konversi":
     st.header("Konversi Satuan")
     st.write("""
@@ -222,6 +234,9 @@ elif menu == "Konversi":
     if st.button("Konversi"):
         # Implement conversion logic here
         st.success("Konversi berhasil!")  # Placeholder for actual conversion result
+
+    if st.button("Beranda"):
+        st.experimental_rerun()
 
 elif menu == "Tentang Kami":
     st.header("Tentang Kami")
