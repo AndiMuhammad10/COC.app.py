@@ -40,22 +40,19 @@ periodik = {
     "Hg": 200.59, "Tl": 204.38, "Pb": 207.2, "Bi": 208.98, "Th": 232.04, "U": 238.03
 }
 
-# Fungsi menghitung berat ekivalen otomatis berdasarkan valensi
-valensi_asam_basa = {
-    "H2SO4": 2,
-    "NaOH": 1,
-    "KOH": 1,
-    "HCl": 1,
-    "HNO3": 1,
-    "CH3COOH": 1,
-    "Ca(OH)2": 2,
-    "Ba(OH)2": 2,
-    "H3PO4": 3
+# Data valensi berbagai jenis senyawa
+valensi_data = {
+    # Asam
+    "H2SO4": 2, "HCl": 1, "HNO3": 1, "CH3COOH": 1, "H3PO4": 3,
+    # Basa
+    "NaOH": 1, "KOH": 1, "Ca(OH)2": 2, "Ba(OH)2": 2,
+    # Redoks
+    "KMnO4": 5, "K2Cr2O7": 6, "Fe2O3": 3
 }
 
 def hitung_berat_ekivalen(senyawa, mr):
-    valensi = valensi_asam_basa.get(senyawa, 1)
-    return round(mr / valensi, 3)
+    valensi = valensi_data.get(senyawa, 1)
+    return round(mr / valensi, 3), valensi
 
 def parse_formula(rumus):
     def extract(tokens):
@@ -96,39 +93,66 @@ def hitung_mr(rumus):
 # Navigasi
 menu = st.sidebar.radio("Navigasi", ["Home", "Penimbangan", "Pengenceran", "Konversi", "Atom Relatif", "Tentang Kami"])
 
-if menu == "Penimbangan":
-    st.header("Penimbangan Zat")
-    senyawa = st.text_input("Masukkan rumus kimia senyawa (contoh: K2Cr2O7, Fe(OH)3, CuSO4.(H2O)5)")
-    if senyawa:
-        try:
-            mr, detail = hitung_mr(senyawa)
-            be = hitung_berat_ekivalen(senyawa, mr)
-            st.success(f"Mr dari {senyawa} adalah {mr} g/mol")
-            st.info(f"Berat Ekivalen dari {senyawa}: {be} g/grek")
-            with st.expander("Detail Atom"):
-                for elemen, jumlah in detail.items():
-                    st.write(f"{elemen}: {jumlah} atom × {periodik[elemen]} g/mol = {jumlah * periodik[elemen]:.3f} g")
-        except Exception as e:
-            st.error(str(e))
-            mr = None
+if menu == "Home":
+    st.title("COC - Calculate Of Concentration")
+    st.subheader("Selamat datang di aplikasi COC")
+    st.write("""
+        Aplikasi ini dirancang untuk mempermudah pengguna dalam menghitung parameter kimia larutan, seperti:
+        - Penimbangan berdasarkan konsentrasi
+        - Pengenceran larutan
+        - Konversi antar satuan
+        - Informasi atom relatif (Mr)
 
-        konsentrasi = st.number_input("Masukkan konsentrasi yang diinginkan:")
-        satuan = st.selectbox("Pilih satuan konsentrasi:", ["Molaritas (g/mol)", "Normalitas (g/grek)", "% (b/v)", "PPM (mg/L)"])
-        volume_ml = st.number_input("Masukkan volume larutan (dalam mL):")
+        COC sangat membantu dalam pembelajaran stoikiometri, yaitu perhitungan kuantitatif antar zat dalam reaksi kimia.
+        Selamat mencoba!
+    """)
 
-        if st.button("Hitung Massa") and mr:
-            volume_l = volume_ml / 1000
-            if satuan == "Molaritas (g/mol)":
-                mol = konsentrasi * volume_l
-                massa = mol * mr
-                st.success(f"Massa {senyawa}: {massa:.4f} g")
-                st.code(f"mol = {konsentrasi} mol/L × {volume_l} L = {mol} mol\nMassa = {mol} mol × {mr} g/mol = {massa} g")
-            elif satuan == "Normalitas (g/grek)":
-                grek = konsentrasi * volume_l
-                massa = grek * be
-                st.success(f"Massa {senyawa}: {massa:.4f} g")
-                st.code(f"grek = {konsentrasi} grek/L × {volume_l} L = {grek} grek\nBerat Ekivalen = {mr} / valensi = {be} g/grek\nMassa = {grek} grek × {be} g/grek = {massa} g")
+if menu == "Pengenceran":
+    st.header("Pengenceran Larutan")
+    pilihan = st.radio("Ingin menentukan apa?", ["Volume Awal (V1)", "Konsentrasi Awal (C1)"])
+
+    if pilihan == "Volume Awal (V1)":
+        c1 = st.number_input("Masukkan Konsentrasi Awal (C1):")
+        c2 = st.number_input("Masukkan Konsentrasi Yang Diinginkan (C2):")
+        v2 = st.number_input("Masukkan Volume Yang Diinginkan (V2) dalam mL:")
+        if st.button("Hitung V1"):
+            v1 = (v2 * c2) / c1
+            st.success(f"Volume awal (V1) yang dibutuhkan: {v1:.2f} mL")
+            st.code(f"V1 = (V2 × C2) / C1 = ({v2} × {c2}) / {c1} = {v1}")
+    else:
+        v1 = st.number_input("Masukkan Volume Awal (V1) dalam mL:")
+        c2 = st.number_input("Masukkan Konsentrasi Yang Diinginkan (C2):")
+        v2 = st.number_input("Masukkan Volume Yang Diinginkan (V2) dalam mL:")
+        if st.button("Hitung C1"):
+            c1 = (v2 * c2) / v1
+            st.success(f"Konsentrasi awal (C1) yang dibutuhkan: {c1:.2f}")
+            st.code(f"C1 = (V2 × C2) / V1 = ({v2} × {c2}) / {v1} = {c1}")
+
     if st.button("Kembali ke Home"):
         st.experimental_rerun()
 
-# (Halaman lainnya tetap sama)
+if menu == "Konversi":
+    st.header("Konversi Satuan Konsentrasi")
+    nilai = st.number_input("Masukkan nilai konsentrasi:")
+    satuan_awal = st.selectbox("Satuan Awal", ["Molaritas (mol/L)", "Normalitas (grek/L)", "% (b/v)", "PPM", "PPB"])
+    satuan_akhir = st.selectbox("Satuan Akhir", ["Molaritas (mol/L)", "Normalitas (grek/L)", "% (b/v)", "PPM", "PPB"])
+
+    if st.button("Konversi"):
+        hasil = nilai  # Placeholder
+        st.success(f"Hasil konversi dari {satuan_awal} ke {satuan_akhir} adalah: {hasil} (fungsi belum lengkap)")
+
+    if st.button("Kembali ke Home"):
+        st.experimental_rerun()
+
+if menu == "Atom Relatif":
+    st.header("Atom Relatif / Mr")
+    rumus = st.text_input("Masukkan rumus senyawa (contoh: H2SO4, NaCl, C6H12O6)")
+    if rumus:
+        try:
+            mr, detail = hitung_mr(rumus)
+            st.success(f"Mr dari {rumus} adalah {mr} g/mol")
+            with st.expander("Detail Atom"):
+                for elemen, jumlah in detail.items():
+                    st.write(f"{elemen}: {jumlah} × {periodik[elemen]} = {jumlah * periodik[elemen]:.3f} g")
+        except Exception as e:
+            st.error(str(e))
