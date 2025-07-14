@@ -117,8 +117,8 @@ Selamat menggunakan, dan semoga bermanfaat‼️‼️
 
 if menu == "Penimbangan":
     st.header("Penimbangan Zat")
-    rumus = st.text_input("Masukkan rumus senyawa (contoh: H2SO4, NaOH, KMnO4)")
-    satuan = st.selectbox("Pilih satuan konsentrasi:", ["Molaritas (mol/L)", "Normalitas (grek/L)", "% (b/v)", "PPM", "PPB"])
+    rumus = st.text_input("Masukkan rumus senyawa (contoh: CuSO4(H2O)5, NaOH, KMnO4)")
+    satuan = st.selectbox("Pilih satuan konsentrasi:", ["Molaritas (mol/L)", "Normalitas (grek/L)", "% (b/v)", "Ppm", "Ppb"])
     konsentrasi = st.number_input("Masukkan konsentrasi:")
     volume_ml = st.number_input("Masukkan volume larutan (dalam mL):")
 
