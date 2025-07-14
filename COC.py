@@ -162,11 +162,13 @@ elif menu == "Penimbangan":
         volume_l = volume_ml / 1000
         
         if satuan == "Normalitas (g/grek)":
-            if senyawa in common_compounds:
-                berat_ekivalen = common_compounds[senyawa]["be"]
+            jenis = st.selectbox("Jenis senyawa (asam, basa, garam, redoks, lain):", ["asam", "basa", "garam", "redoks", "lain"])
+            if jenis in common_compounds:
+                n = st.number_input("Berapa jumlah ion yang dilepaskan?", min_value=1)
+                berat_ekivalen = mr / n
                 hasil, penjelasan = hitung_gram(mr, konsentrasi, volume_l, satuan, berat_ekivalen)
             else:
-                st.error("Tidak dapat menghitung Normalitas: berat ekivalen tidak diketahui")
+                st.error("Jenis senyawa tidak dikenali.")
                 st.stop()
         else:
             hasil, penjelasan = hitung_gram(mr, konsentrasi, volume_l, satuan)
@@ -213,7 +215,10 @@ elif menu == "Konversi":
     
     if st.button("Konversi"):
         # Implementasi konversi
-        st.success("Konversi berhasil!")  # Placeholder for conversion result
+        # Placeholder for conversion logic
+        if from_unit == "Molaritas (g/mol)" and to_unit == "Normalitas (g/grek)":
+            # Implement conversion logic here
+            st.success("Konversi berhasil!")  # Placeholder for conversion result
 
     if st.button("Kembali ke Beranda"):
         st.experimental_rerun()
