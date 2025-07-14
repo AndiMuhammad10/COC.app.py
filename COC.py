@@ -3,37 +3,6 @@ import re
 
 st.set_page_config(page_title="COC - Calculate Of Concentration", layout="wide")
 
-# Custom CSS untuk background dan font
-st.markdown(
-    """
-    <style>
-    @import url('https://fonts.googleapis.com/css2?family=Orbitron&display=swap');
-    
-    body {
-        background: linear-gradient(135deg, #4B0082, #8A2BE2);
-        background-size: 400% 400%;
-        animation: gradient 15s ease infinite;
-        color: white;
-        font-family: 'Orbitron', sans-serif;
-    }
-    
-    @keyframes gradient {
-        0% { background-position: 0% 50%; }
-        50% { background-position: 100% 50%; }
-        100% { background-position: 0% 50%; }
-    }
-    
-    .stButton button {
-        background-color: #7E57C2;
-        color: white;
-        border-radius: 8px;
-        margin: 5px;
-    }
-    </style>
-    """,
-    unsafe_allow_html=True
-)
-
 # Tabel Periodik Lengkap
 periodik = {
     "H": 1.008, "He": 4.0026, "Li": 6.94, "Be": 9.0122, "B": 10.81, "C": 12.011,
@@ -52,16 +21,8 @@ periodik = {
     "Hg": 200.59, "Tl": 204.38, "Pb": 207.2, "Bi": 208.98, "Th": 232.04, "U": 238.03
 }
 
-# Database senyawa umum dengan berat ekivalen
-common_compounds = {
-    "HCl": {"type": "acid", "H+": 1, "be": 36.46},
-    "H2SO4": {"type": "acid", "H+": 2, "be": 49.04},
-    "NaOH": {"type": "base", "OH-": 1, "be": 40.00},
-    "HNO3": {"type": "acid", "H+": 1, "be": 63.01},
-    "KOH": {"type": "base", "OH-": 1, "be": 56.11},
-}
+# Fungsi parsing rumus dengan tanda kurung dan hidrasi
 
-# Fungsi parsing rumus dengan hidrasi
 def parse_formula(rumus):
     def extract(tokens):
         stack = [[]]
@@ -84,8 +45,6 @@ def parse_formula(rumus):
             i += 1
         return stack[0]
 
-    # Mengganti hidrasi
-    rumus = re.sub(r'\((\w+)\)(\d+)', lambda m: f"{m.group(2)}{m.group(1)}", rumus)
     tokens = re.findall(r'[A-Z][a-z]?|\d+|\(|\)', rumus)
     elements = extract(tokens)
     hasil = {}
@@ -96,36 +55,37 @@ def parse_formula(rumus):
     return hasil
 
 # Hitung Mr dari hasil parsing
+
 def hitung_mr(rumus):
     komposisi = parse_formula(rumus)
     total = sum(periodik[el] * jumlah for el, jumlah in komposisi.items())
     return round(total, 3), komposisi
 
 # Fungsi menghitung massa dari konsentrasi
-def hitung_gram(mr, konsentrasi, volume_l, satuan, berat_ekivalen=None):
+
+def hitung_gram(mr, konsentrasi, volume_l, satuan):
     if satuan == "Molaritas (g/mol)":
         mol = konsentrasi * volume_l
-        return mol * mr, f"mol = {konsentrasi} mol/L × {volume_l} L = {mol:.4f} mol\nMassa = {mol:.4f} mol × {mr} g/mol = {mol * mr:.4f} g"
+        return mol * mr, f"mol = {konsentrasi} mol/L × {volume_l} L = {mol} mol\nMassa = {mol} mol × {mr} g/mol = {mol * mr} g"
     elif satuan == "Normalitas (g/grek)":
-        if berat_ekivalen is None:
-            raise ValueError("Berat ekivalen harus diberikan untuk Normalitas.")
         grek = konsentrasi * volume_l
-        return grek * berat_ekivalen, f"grek = {konsentrasi} grek/L × {volume_l} L = {grek:.4f} grek\nMassa = {grek:.4f} grek × {berat_ekivalen} g/grek = {grek * berat_ekivalen:.4f} g"
+        return grek * mr, f"grek = {konsentrasi} grek/L × {volume_l} L = {grek} grek\nMassa = {grek} grek × {mr} g/grek = {grek * mr} g"
     elif satuan == "% (b/v)":
-        return konsentrasi * volume_l * 10, f"Massa = {konsentrasi}% × {volume_l} L × 10 = {konsentrasi * volume_l * 10:.4f} g"
+        return konsentrasi * volume_l * 10, f"Massa = {konsentrasi}% × {volume_l} L × 10 = {konsentrasi * volume_l * 10} g"
     elif satuan == "PPM (mg/L)":
         mg = konsentrasi * volume_l
-        return mg / 1000, f"Massa = {konsentrasi} mg/L × {volume_l} L = {mg} mg = {mg / 1000:.4f} g"
+        return mg / 1000, f"Massa = {konsentrasi} mg/L × {volume_l} L = {mg} mg = {mg / 1000} g"
 
 # Fungsi pengenceran
+
 def hitung_pengenceran(v1=None, c1=None, v2=None, c2=None):
     if v1 is None:
-        return (v2 * c2) / c1, f"V1 = (V2 × C2) / C1 = ({v2} × {c2}) / {c1} = {(v2 * c2) / c1:.6f}"
+        return (v2 * c2) / c1, f"V1 = (V2 × C2) / C1 = ({v2} × {c2}) / {c1} = {(v2 * c2) / c1}"
     elif c1 is None:
-        return (v2 * c2) / v1, f"C1 = (V2 × C2) / V1 = ({v2} × {c2}) / {v1} = {(v2 * c2) / v1:.6f}"
+        return (v2 * c2) / v1, f"C1 = (V2 × C2) / V1 = ({v2} × {c2}) / {v1} = {(v2 * c2) / v1}"
 
 # Sidebar navigation
-menu = st.sidebar.radio("Navigasi", ["Home", "Penimbangan", "Pengenceran", "Konversi", "Tentang Kami"])
+menu = st.sidebar.radio("Navigasi", ["Home", "Penimbangan", "Pengenceran", "Tentang Kami"])
 
 # Tampilan halaman
 if menu == "Home":
@@ -136,8 +96,7 @@ if menu == "Home":
         - Penimbangan larutan berdasarkan konsentrasi
         - Pengenceran larutan
 
-        Materi ini berkaitan erat dengan stoikiometri, yaitu ilmu yang mempelajari perbandingan kuantitatif antara reaktan dan produk dalam reaksi kimia. 
-        Dengan aplikasi ini, Anda dapat dengan mudah menghitung massa yang diperlukan untuk membuat larutan dengan konsentrasi tertentu, serta melakukan pengenceran larutan dengan tepat.
+        Materi ini berkaitan erat dengan stoikiometri, yaitu ilmu yang mempelajari perbandingan kuantitatif antara reaktan dan produk dalam reaksi kimia.
     """)
 
 elif menu == "Penimbangan":
@@ -160,25 +119,10 @@ elif menu == "Penimbangan":
 
     if st.button("Hitung Massa") and mr is not None:
         volume_l = volume_ml / 1000
-        
-        if satuan == "Normalitas (g/grek)":
-            jenis = st.selectbox("Jenis senyawa (asam, basa, garam, redoks, lain):", ["asam", "basa", "garam", "redoks", "lain"])
-            if jenis in common_compounds:
-                n = st.number_input("Berapa jumlah ion yang dilepaskan?", min_value=1)
-                berat_ekivalen = mr / n
-                hasil, penjelasan = hitung_gram(mr, konsentrasi, volume_l, satuan, berat_ekivalen)
-            else:
-                st.error("Jenis senyawa tidak dikenali.")
-                st.stop()
-        else:
-            hasil, penjelasan = hitung_gram(mr, konsentrasi, volume_l, satuan)
-        
+        hasil, penjelasan = hitung_gram(mr, konsentrasi, volume_l, satuan)
         st.success(f"Massa {senyawa} yang harus ditimbang: {hasil:.4f} g")
         with st.expander("Lihat Perhitungan"):
             st.code(penjelasan)
-
-    if st.button("Kembali ke Beranda"):
-        st.experimental_rerun()
 
 elif menu == "Pengenceran":
     st.header("Pengenceran Larutan")
@@ -203,32 +147,19 @@ elif menu == "Pengenceran":
             with st.expander("Lihat Perhitungan"):
                 st.code(penjelasan)
 
-    if st.button("Kembali ke Beranda"):
-        st.experimental_rerun()
-
-elif menu == "Konversi":
-    st.header("Konversi Satuan")
-    st.subheader("Konversi Konsentrasi")
-    value = st.number_input("Masukkan nilai konsentrasi:")
-    from_unit = st.selectbox("Dari satuan:", ["Molaritas (g/mol)", "Normalitas (g/grek)", "% (b/v)", "PPM (mg/L)", "PPB (µg/L)"])
-    to_unit = st.selectbox("Ke satuan:", ["Molaritas (g/mol)", "Normalitas (g/grek)", "% (b/v)", "PPM (mg/L)", "PPB (µg/L)"])
-    
-    if st.button("Konversi"):
-        # Implementasi konversi
-        # Placeholder for conversion logic
-        if from_unit == "Molaritas (g/mol)" and to_unit == "Normalitas (g/grek)":
-            # Implement conversion logic here
-            st.success("Konversi berhasil!")  # Placeholder for conversion result
-
-    if st.button("Kembali ke Beranda"):
-        st.experimental_rerun()
-
 elif menu == "Tentang Kami":
     st.header("Tentang Kami")
     st.write("""
-    Aplikasi ini dikembangkan untuk membantu pengguna dalam menghitung berbagai parameter dalam kimia analisis.
-    Kami berharap aplikasi ini dapat mempermudah pemahaman dan penerapan konsep-konsep kimia dalam kehidupan sehari-hari.
+    Aplikasi ini dikembangkan oleh:
+
+    - Andi Muhammad Tegar A A 2460322
+    - Inezza Azmi Tobri       2460390
+    - Muhammad Habibie Rasyha 2460438
+    - Saskia Putri Irfani     2460512
+    - Zahra Nandya Putri N    2460543
+
+    Politkenik  AKA Bogor - Kimia Analisis
     """)
 
-    if st.button("Kembali ke Beranda"):
-        st.experimental_rerun()
+
+
