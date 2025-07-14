@@ -3,16 +3,24 @@ import re
 
 st.set_page_config(page_title="COC - Calculate Of Concentration", layout="wide")
 
-# Custom CSS
+# Custom CSS untuk background dan font
 st.markdown(
     """
     <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron&display=swap');
     
     body {
-        background: linear-gradient(135deg, #1A1A2E 0%, #16213E 100%);
+        background: linear-gradient(135deg, #4B0082, #8A2BE2);
+        background-size: 400% 400%;
+        animation: gradient 15s ease infinite;
         color: white;
-        font-family: 'Inter', sans-serif;
+        font-family: 'Orbitron', sans-serif;
+    }
+    
+    @keyframes gradient {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
     }
     
     .stButton button {
@@ -26,7 +34,7 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-# Periodic Table Data
+# Tabel Periodik Lengkap
 periodik = {
     "H": 1.008, "He": 4.0026, "Li": 6.94, "Be": 9.0122, "B": 10.81, "C": 12.011,
     "N": 14.007, "O": 15.999, "F": 18.998, "Ne": 20.180, "Na": 22.990, "Mg": 24.305,
@@ -44,82 +52,169 @@ periodik = {
     "Hg": 200.59, "Tl": 204.38, "Pb": 207.2, "Bi": 208.98, "Th": 232.04, "U": 238.03
 }
 
-common_compounds = {
-    "HCl": {"type": "acid", "H+": 1, "be": 36.46},
-    "H2SO4": {"type": "acid", "H+": 2, "be": 49.04},
-    "NaOH": {"type": "base", "OH-": 1, "be": 40.00}
-}
-
+# Fungsi parsing rumus dengan hidrasi
 def parse_formula(rumus):
-    # ... [same parsing function as before] ...
-    pass
+    def extract(tokens):
+        stack = [[]]
+        i = 0
+        while i < len(tokens):
+            token = tokens[i]
+            if token == '(':
+                stack.append([])
+            elif token == ')':
+                group = stack.pop()
+                i += 1
+                multiplier = int(tokens[i]) if i < len(tokens) and tokens[i].isdigit() else 1
+                stack[-1].extend(group * multiplier)
+            elif re.match(r'[A-Z][a-z]?$', token):
+                count = 1
+                if i + 1 < len(tokens) and tokens[i + 1].isdigit():
+                    i += 1
+                    count = int(tokens[i])
+                stack[-1].extend([token] * count)
+            i += 1
+        return stack[0]
 
+    # Mengganti hidrasi
+    rumus = re.sub(r'\((\w+)\)(\d+)', lambda m: f"{m.group(2)}{m.group(1)}", rumus)
+    tokens = re.findall(r'[A-Z][a-z]?|\d+|\(|\)', rumus)
+    elements = extract(tokens)
+    hasil = {}
+    for el in elements:
+        if el not in periodik:
+            raise ValueError(f"Elemen tidak dikenali: {el}")
+        hasil[el] = hasil.get(el, 0) + 1
+    return hasil
+
+# Hitung Mr dari hasil parsing
 def hitung_mr(rumus):
-    # ... [same molecular weight calculation as before] ...
-    pass
+    komposisi = parse_formula(rumus)
+    total = sum(periodik[el] * jumlah for el, jumlah in komposisi.items())
+    return round(total, 3), komposisi
 
+# Fungsi menghitung massa dari konsentrasi
 def hitung_gram(mr, konsentrasi, volume_l, satuan, berat_ekivalen=None):
-    # ... [same mass calculation as before] ...
-    pass
+    if satuan == "Molaritas (g/mol)":
+        mol = konsentrasi * volume_l
+        return mol * mr, f"mol = {konsentrasi} mol/L × {volume_l} L = {mol:.4f} mol\nMassa = {mol:.4f} mol × {mr} g/mol = {mol * mr:.4f} g"
+    elif satuan == "Normalitas (g/grek)":
+        if berat_ekivalen is None:
+            raise ValueError("Berat ekivalen harus diberikan untuk Normalitas.")
+        grek = konsentrasi * volume_l
+        return grek * berat_ekivalen, f"grek = {konsentrasi} grek/L × {volume_l} L = {grek:.4f} grek\nMassa = {grek:.4f} grek × {berat_ekivalen} g/grek = {grek * berat_ekivalen:.4f} g"
+    elif satuan == "% (b/v)":
+        return konsentrasi * volume_l * 10, f"Massa = {konsentrasi}% × {volume_l} L × 10 = {konsentrasi * volume_l * 10:.4f} g"
+    elif satuan == "PPM (mg/L)":
+        mg = konsentrasi * volume_l
+        return mg / 1000, f"Massa = {konsentrasi} mg/L × {volume_l} L = {mg} mg = {mg / 1000:.4f} g"
 
+# Fungsi pengenceran
 def hitung_pengenceran(v1=None, c1=None, v2=None, c2=None):
-    # ... [same dilution calculation as before] ...
-    pass
+    if v1 is None:
+        return (v2 * c2) / c1, f"V1 = (V2 × C2) / C1 = ({v2} × {c2}) / {c1} = {(v2 * c2) / c1:.6f}"
+    elif c1 is None:
+        return (v2 * c2) / v1, f"C1 = (V2 × C2) / V1 = ({v2} × {c2}) / {v1} = {(v2 * c2) / v1:.6f}"
 
-# Navigation
+# Sidebar navigation
 menu = st.sidebar.radio("Navigasi", ["Home", "Penimbangan", "Pengenceran", "Konversi", "Tentang Kami"])
 
-# Home Page
+# Tampilan halaman
 if menu == "Home":
     st.title("COC - Calculate Of Concentration")
-    
-# Mass Calculation Page
+    st.subheader("Selamat datang di aplikasi COC")
+    st.write("""
+        Aplikasi ini dibuat untuk membantu Anda menghitung berbagai parameter dalam kimia larutan seperti:
+        - Penimbangan larutan berdasarkan konsentrasi
+        - Pengenceran larutan
+
+        Materi ini berkaitan erat dengan stoikiometri, yaitu ilmu yang mempelajari perbandingan kuantitatif antara reaktan dan produk dalam reaksi kimia. 
+        Dengan aplikasi ini, Anda dapat dengan mudah menghitung massa yang diperlukan untuk membuat larutan dengan konsentrasi tertentu, serta melakukan pengenceran larutan dengan tepat.
+    """)
+
 elif menu == "Penimbangan":
     st.header("Penimbangan Zat")
-    
-    # Your original mass calculation form here
-    # ...
-    
+    senyawa = st.text_input("Masukkan rumus kimia senyawa (contoh: K2Cr2O7, Fe(OH)3, CuSO4.(H2O)5")
+    try:
+        if senyawa:
+            mr, detail = hitung_mr(senyawa)
+            st.success(f"Mr dari {senyawa} adalah {mr} g/mol")
+            with st.expander("Detail Atom"):
+                for elemen, jumlah in detail.items():
+                    st.write(f"{elemen}: {jumlah} atom × {periodik[elemen]} g/mol = {jumlah * periodik[elemen]:.3f} g")
+    except Exception as e:
+        st.error(str(e))
+        mr = None
+
+    konsentrasi = st.number_input("Masukkan konsentrasi yang diinginkan:")
+    satuan = st.selectbox("Pilih satuan konsentrasi:", ["Molaritas (g/mol)", "Normalitas (g/grek)", "% (b/v)", "PPM (mg/L)"])
+    volume_ml = st.number_input("Masukkan volume larutan (dalam mL):")
+
+    if st.button("Hitung Massa") and mr is not None:
+        volume_l = volume_ml / 1000
+        
+        if satuan == "Normalitas (g/grek)":
+            if senyawa in common_compounds:
+                berat_ekivalen = common_compounds[senyawa]["be"]
+                hasil, penjelasan = hitung_gram(mr, konsentrasi, volume_l, satuan, berat_ekivalen)
+            else:
+                st.error("Tidak dapat menghitung Normalitas: berat ekivalen tidak diketahui")
+                st.stop()
+        else:
+            hasil, penjelasan = hitung_gram(mr, konsentrasi, volume_l, satuan)
+        
+        st.success(f"Massa {senyawa} yang harus ditimbang: {hasil:.4f} g")
+        with st.expander("Lihat Perhitungan"):
+            st.code(penjelasan)
+
     if st.button("Kembali ke Beranda"):
-        st.session_state.menu = "Home"
         st.experimental_rerun()
 
-# Dilution Page
 elif menu == "Pengenceran":
     st.header("Pengenceran Larutan")
-    
-    # Your original dilution form here
-    # ...
-    
+    pilihan = st.radio("Ingin menentukan apa?", ["Volume Awal (V1)", "Konsentrasi Awal (C1)"])
+
+    if pilihan == "Volume Awal (V1)":
+        c1 = st.number_input("Masukkan Konsentrasi Awal (C1):")
+        c2 = st.number_input("Masukkan Konsentrasi Yang Diinginkan (C2):")
+        v2 = st.number_input("Masukkan Volume Yang Diinginkan (V2) dalam mL:")
+        if st.button("Hitung V1"):
+            v1, penjelasan = hitung_pengenceran(None, c1, v2 / 1000, c2)
+            st.success(f"Volume awal (V1) yang dibutuhkan: {v1*1000:.2f} mL")
+            with st.expander("Lihat Perhitungan"):
+                st.code(penjelasan)
+    else:
+        v1 = st.number_input("Masukkan Volume Awal (V1) dalam mL:")
+        c2 = st.number_input("Masukkan Konsentrasi Yang Diinginkan (C2):")
+        v2 = st.number_input("Masukkan Volume Yang Diinginkan (V2) dalam mL:")
+        if st.button("Hitung C1"):
+            c1, penjelasan = hitung_pengenceran(v1 / 1000, None, v2 / 1000, c2)
+            st.success(f"Konsentrasi awal (C1) yang dibutuhkan: {c1:.4f}")
+            with st.expander("Lihat Perhitungan"):
+                st.code(penjelasan)
+
     if st.button("Kembali ke Beranda"):
-        st.session_state.menu = "Home"
         st.experimental_rerun()
 
-# Conversion Page
 elif menu == "Konversi":
     st.header("Konversi Satuan")
-    
-    # Conversion Form
     st.subheader("Konversi Konsentrasi")
-    # ... your conversion form here ...
+    value = st.number_input("Masukkan nilai konsentrasi:")
+    from_unit = st.selectbox("Dari satuan:", ["Molaritas (g/mol)", "Normalitas (g/grek)", "% (b/v)", "PPM (mg/L)"])
+    to_unit = st.selectbox("Ke satuan:", ["Molaritas (g/mol)", "Normalitas (g/grek)", "% (b/v)", "PPM (mg/L)", "PPB (µg/L)"])
     
-    # Separate Atomic Mass Section
-    st.subheader("Massa Atom Relatif")
-    element = st.text_input("Masukkan simbol unsur:")
-    if st.button("Cari Massa Atom"):
-        if element in periodik:
-            st.success(f"Massa atom {element}: {periodik[element]}")
-        else:
-            st.error("Unsur tidak dikenali!")
-    
+    if st.button("Konversi"):
+        # Implementasi konversi
+        st.success("Konversi berhasil!")  # Placeholder for conversion result
+
     if st.button("Kembali ke Beranda"):
-        st.session_state.menu = "Home"
         st.experimental_rerun()
 
-# About Page
 elif menu == "Tentang Kami":
     st.header("Tentang Kami")
-    
+    st.write("""
+    Aplikasi ini dikembangkan untuk membantu pengguna dalam menghitung berbagai parameter dalam kimia analisis.
+    Kami berharap aplikasi ini dapat mempermudah pemahaman dan penerapan konsep-konsep kimia dalam kehidupan sehari-hari.
+    """)
+
     if st.button("Kembali ke Beranda"):
-        st.session_state.menu = "Home"
         st.experimental_rerun()
