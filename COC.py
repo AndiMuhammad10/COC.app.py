@@ -241,4 +241,12 @@ if menu == "Tentang Kami":
     <div style="border: 2px solid white; padding: 15px; border-radius: 10px;">
     <p>Aplikasi ini dikembangkan oleh:</p>
     <ul>
-      <li>Andi
+      <li>Andi Muhammad Tegar A A - 2460322</li>
+      <li>Inezza Azmi Tobri - 2460390</li>
+      <li>Muhammad Habibie Rasyha - 2460438</li>
+      <li>Saskia Putri Irfani - 2460512</li>
+      <li>Zahra Nandya Putri N - 2460543</li>
+    </ul>
+    <p>Politeknik AKA Bogor - Kimia Analisis</p>
+    </div>
+    """, unsafe_allow_html=True)
