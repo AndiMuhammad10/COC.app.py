@@ -1,13 +1,22 @@
 import streamlit as st
 import re
-import numpy as np
-import pandas as pd
-import matplotlib.pyplot as plt  # WAJIB agar grafik muncul
 
-# Buat requirements.txt otomatis
-if not os.path.exists('requirements.txt'):
-    with open('requirements.txt', 'w') as f:
-        f.write("streamlit\nnumpy\npandas\nmatplotlib\nPillow\n")
+st.set_page_config(page_title="COC - Calculate Of Concentration", layout="wide")
+
+# CSS styling modern futuristik
+st.markdown("""
+    <style>
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron&display=swap');
+    html, body, [class*="css"]  {
+        font-family: 'Orbitron', sans-serif;
+        background-color: #660066; /* Latar belakang ungu */
+        color: #00FF00; /* Warna font hijau cerah */
+    }
+    h1, h2, h3, h4, h5, h6 {
+        color: #00FF00; /* Warna judul hijau cerah */
+    }
+    </style>
+""", unsafe_allow_html=True)
 
 # Tabel Periodik Lengkap
 periodik = {
@@ -214,7 +223,7 @@ if menu == "Atom Relatif":
                 """)
 
         except Exception as e:
-            st.error(f"❌ Terjadi kesalahan: {e}")
+            st.error(str(e))
 
 if menu == "Tentang Kami":
     st.header("Tentang Kami")
