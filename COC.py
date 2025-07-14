@@ -45,11 +45,15 @@ periodik = {
 
 # Data valensi tambahan
 valensi_data = {
-    "HCl": 1, "HNO3": 1, "H2SO4": 2, "H3PO4": 3, "CH3COOH": 1, "H2CO3": 2,
-    "NaOH": 1, "KOH": 1, "Ca(OH)2": 2, "Ba(OH)2": 2, "Al(OH)3": 3,
-    "NaCl": 1, "K2SO4": 2, "FeCl3": 3,
-    "KMnO4": 5, "K2Cr2O7": 6, "Fe2O3": 3, "Cl2": 2, "H2O2": 2, "CuO": 2,
-    "HBr": 1, "HI": 1, "HClO4": 1, "LiOH": 1, "Mg(OH)2": 2, "Zn(OH)2": 2
+    "HCl": 1, "H2SO4": 2, "HNO3": 1, "CH3COOH": 1, "H3PO4": 3, "H2CO3": 2,
+    "H2S": 2, "H2C2O4": 2, "HClO3": 1, "H2CrO4": 2,
+    "NaOH": 1, "KOH": 1, "Ca(OH)2": 2, "Mg(OH)2": 2, "Ba(OH)2": 2, "LiOH": 1,
+    "NH4OH": 1, "Al(OH)3": 3, "Sr(OH)2": 2, "Fe(OH)3": 3,
+    "NaCl": 1, "K2SO4": 2, "Na2CO3": 2, "CaCl2": 2, "MgSO4": 2, "NH4Cl": 1,
+    "NaHCO3": 1, "KNO3": 1, "AgNO3": 1, "Ca3(PO4)2": 3,
+    "KMnO4": 5, "Na2Cr2O7": 6, "H2O2": 1, "Fe2O3": 3, "CuSO4": 2, "NH4NO3": 1,
+    "Na2S2O3": 2, "CoCl2": 2, "HClO4": 1, "K2Cr2O7": 6,
+    "HClO": 1, "H3BO3": 3, "CH3COOK": 1, "ZnCl2": 2, "Na3PO4": 3, "Li2CO3": 2
 }
 
 def hitung_berat_ekivalen(senyawa, mr):
