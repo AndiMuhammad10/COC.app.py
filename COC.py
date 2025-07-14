@@ -9,15 +9,8 @@ st.markdown("""
     @import url('https://fonts.googleapis.com/css2?family=Orbitron&display=swap');
     html, body, [class*="css"]  {
         font-family: 'Orbitron', sans-serif;
-        background: linear-gradient(-45deg, #000000, #006600);
-        background-size: 400% 400%;
-        animation: gradient 15s ease infinite;
+        background: linear-gradient(-45deg, #000000, #006600); /* Latar belakang gradasi statis */
         color: #00FF00; /* Warna font hijau cerah */
-    }
-    @keyframes gradient {
-        0% {background-position: 0% 50%;}
-        50% {background-position: 100% 50%;}
-        100% {background-position: 0% 50%;}
     }
     h1, h2, h3, h4, h5, h6 {
         color: #00FF00; /* Warna judul hijau cerah */
