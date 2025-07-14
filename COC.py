@@ -40,14 +40,18 @@ periodik = {
     "Hg": 200.59, "Tl": 204.38, "Pb": 207.2, "Bi": 208.98, "Th": 232.04, "U": 238.03
 }
 
-# Data valensi berbagai jenis senyawa
+# Data valensi tambahan
 valensi_data = {
-    # Asam
-    "H2SO4": 2, "HCl": 1, "HNO3": 1, "CH3COOH": 1, "H3PO4": 3,
-    # Basa
-    "NaOH": 1, "KOH": 1, "Ca(OH)2": 2, "Ba(OH)2": 2,
-    # Redoks
-    "KMnO4": 5, "K2Cr2O7": 6, "Fe2O3": 3
+    # Asam kuat dan lemah
+    "HCl": 1, "HNO3": 1, "H2SO4": 2, "H3PO4": 3, "CH3COOH": 1, "H2CO3": 2,
+    # Basa kuat dan lemah
+    "NaOH": 1, "KOH": 1, "Ca(OH)2": 2, "Ba(OH)2": 2, "Al(OH)3": 3,
+    # Garam
+    "NaCl": 1, "K2SO4": 2, "FeCl3": 3,
+    # Oksidator/Redoks
+    "KMnO4": 5, "K2Cr2O7": 6, "Fe2O3": 3, "Cl2": 2, "H2O2": 2, "CuO": 2,
+    # Tambahan
+    "HBr": 1, "HI": 1, "HClO4": 1, "LiOH": 1, "Mg(OH)2": 2, "Zn(OH)2": 2
 }
 
 def hitung_berat_ekivalen(senyawa, mr):
@@ -90,7 +94,6 @@ def hitung_mr(rumus):
     total = sum(periodik[el] * jumlah for el, jumlah in komposisi.items())
     return round(total, 3), komposisi
 
-# Navigasi
 menu = st.sidebar.radio("Navigasi", ["Home", "Penimbangan", "Pengenceran", "Konversi", "Atom Relatif", "Tentang Kami"])
 
 if menu == "Home":
@@ -114,25 +117,23 @@ if menu == "Penimbangan":
     konsentrasi = st.number_input("Masukkan konsentrasi:")
     volume_ml = st.number_input("Masukkan volume larutan (dalam mL):")
 
-    if rumus:
-        try:
-            mr, detail = hitung_mr(rumus)
-            be, valensi = hitung_berat_ekivalen(rumus, mr)
-            st.success(f"Mr dari {rumus} = {mr} g/mol")
-            st.info(f"Berat Ekivalen (BE) dari {rumus} = {be} g/grek (Valensi = {valensi})")
+    if st.button("Hitung"): 
+        if rumus:
+            try:
+                mr, detail = hitung_mr(rumus)
+                be, valensi = hitung_berat_ekivalen(rumus, mr)
+                st.success(f"Mr dari {rumus} = {mr} g/mol")
+                st.info(f"Berat Ekivalen (BE) dari {rumus} = {be} g/grek (Valensi = {valensi})")
 
-            volume_l = volume_ml / 1000
-            if satuan == "Molaritas (mol/L)":
-                massa = konsentrasi * volume_l * mr
-                st.success(f"Massa = {konsentrasi} mol/L × {volume_l} L × {mr} g/mol = {massa:.4f} g")
-            else:
-                massa = konsentrasi * volume_l * be
-                st.success(f"Massa = {konsentrasi} grek/L × {volume_l} L × {be} g/grek = {massa:.4f} g")
-        except Exception as e:
-            st.error(str(e))
-
-    if st.button("Kembali ke Home"):
-        st.experimental_rerun()
+                volume_l = volume_ml / 1000
+                if satuan == "Molaritas (mol/L)":
+                    massa = konsentrasi * volume_l * mr
+                    st.success(f"Massa = {konsentrasi} mol/L × {volume_l} L × {mr} g/mol = {massa:.4f} g")
+                else:
+                    massa = konsentrasi * volume_l * be
+                    st.success(f"Massa = {konsentrasi} grek/L × {volume_l} L × {be} g/grek = {massa:.4f} g")
+            except Exception as e:
+                st.error(str(e))
 
 if menu == "Pengenceran":
     st.header("Pengenceran Larutan")
@@ -155,9 +156,6 @@ if menu == "Pengenceran":
             st.success(f"Konsentrasi awal (C1) yang dibutuhkan: {c1:.2f}")
             st.code(f"C1 = (V2 × C2) / V1 = ({v2} × {c2}) / {v1} = {c1}")
 
-    if st.button("Kembali ke Home"):
-        st.experimental_rerun()
-
 if menu == "Konversi":
     st.header("Konversi Satuan Konsentrasi")
     nilai = st.number_input("Masukkan nilai konsentrasi:")
@@ -167,9 +165,6 @@ if menu == "Konversi":
     if st.button("Konversi"):
         hasil = nilai  # Placeholder
         st.success(f"Hasil konversi dari {satuan_awal} ke {satuan_akhir} adalah: {hasil} (fungsi belum lengkap)")
-
-    if st.button("Kembali ke Home"):
-        st.experimental_rerun()
 
 if menu == "Atom Relatif":
     st.header("Atom Relatif / Mr")
@@ -186,14 +181,16 @@ if menu == "Atom Relatif":
 
 if menu == "Tentang Kami":
     st.header("Tentang Kami")
-    st.write("""
-    Aplikasi ini dikembangkan oleh:
-
-    - Andi Muhammad Tegar A A 2460322
-    - Inezza Azmi Tobri       2460390
-    - Muhammad Habibie Rasyha 2460438
-    - Saskia Putri Irfani     2460512
-    - Zahra Nandya Putri N    2460543
-
-    Politeknik AKA Bogor - Kimia Analisis
-    """)
+    st.markdown("""
+    <div style="border: 2px solid white; padding: 15px; border-radius: 10px;">
+    <p>Aplikasi ini dikembangkan oleh:</p>
+    <ul>
+      <li>Andi Muhammad Tegar A A - 2460322</li>
+      <li>Inezza Azmi Tobri - 2460390</li>
+      <li>Muhammad Habibie Rasyha - 2460438</li>
+      <li>Saskia Putri Irfani - 2460512</li>
+      <li>Zahra Nandya Putri N - 2460543</li>
+    </ul>
+    <p>Politeknik AKA Bogor - Kimia Analisis</p>
+    </div>
+    """, unsafe_allow_html=True)
