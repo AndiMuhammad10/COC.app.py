@@ -131,7 +131,24 @@ if menu == "Penimbangan":
                     massa = konsentrasi * volume_l / 1000
                 elif satuan == "PPB":
                     massa = konsentrasi * volume_l / 1_000_000
+                
                 st.success(f"Massa yang harus ditimbang: {massa:.4f} g")
+                
+                with st.expander("Cara Perhitungan"):
+                    st.write(f"""
+                    1. **Hitung Mr (Massa Molar)**: 
+                       - Mr dari {rumus} = {mr} g/mol
+                    2. **Hitung Berat Ekivalen (BE)**:
+                       - BE = Mr / Valensi = {mr} / {valensi} = {be} g/grek
+                    3. **Hitung Massa**:
+                       - Berdasarkan satuan konsentrasi yang dipilih:
+                         - Molaritas: Massa = Konsentrasi × Volume × Mr = {konsentrasi} × {volume_l:.3f} × {mr} = {massa:.4f} g
+                         - Normalitas: Massa = Konsentrasi × Volume × BE = {konsentrasi} × {volume_l:.3f} × {be} = {massa:.4f} g
+                         - % (b/v): Massa = Konsentrasi × Volume × 10 = {konsentrasi} × {volume_l:.3f} × 10 = {massa:.4f} g
+                         - PPM: Massa = Konsentrasi × Volume / 1000 = {konsentrasi} × {volume_l:.3f} / 1000 = {massa:.4f} g
+                         - PPB: Massa = Konsentrasi × Volume / 1,000,000 = {konsentrasi} × {volume_l:.3f} / 1,000,000 = {massa:.4f} g
+                    """)
+
             except Exception as e:
                 st.error(str(e))
 
@@ -146,7 +163,11 @@ if menu == "Pengenceran":
         if st.button("Hitung V1"):
             v1 = (v2 * c2) / c1
             st.success(f"Volume awal (V1) yang dibutuhkan: {v1:.2f} mL")
-            st.code(f"V1 = (V2 × C2) / C1 = ({v2} × {c2}) / {c1} = {v1}")
+            with st.expander("Cara Perhitungan"):
+                st.write(f"""
+                V1 = (V2 × C2) / C1 = ({v2} × {c2}) / {c1} = {v1:.2f} mL
+                """)
+
     else:
         v1 = st.number_input("Masukkan Volume Awal (V1) dalam mL:")
         c2 = st.number_input("Masukkan Konsentrasi Yang Diinginkan (C2):")
@@ -154,7 +175,10 @@ if menu == "Pengenceran":
         if st.button("Hitung C1"):
             c1 = (v2 * c2) / v1
             st.success(f"Konsentrasi awal (C1) yang dibutuhkan: {c1:.2f}")
-            st.code(f"C1 = (V2 × C2) / V1 = ({v2} × {c2}) / {v1} = {c1}")
+            with st.expander("Cara Perhitungan"):
+                st.write(f"""
+                C1 = (V2 × C2) / V1 = ({v2} × {c2}) / {v1} = {c1:.2f}
+                """)
 
 if menu == "Konversi":
     st.header("Konversi Satuan Konsentrasi")
@@ -176,6 +200,18 @@ if menu == "Konversi":
             hasil = nilai / 1000
         st.success(f"Hasil konversi dari {satuan_awal} ke {satuan_akhir} adalah: {hasil}")
 
+        with st.expander("Cara Perhitungan"):
+            if satuan_awal == satuan_akhir:
+                st.write(f"Hasil = {nilai} (sama dengan satuan awal)")
+            elif satuan_awal == "% (b/v)" and satuan_akhir == "PPM":
+                st.write(f"Hasil = {nilai} × 10000 = {hasil}")
+            elif satuan_awal == "PPM" and satuan_akhir == "% (b/v)":
+                st.write(f"Hasil = {nilai} / 10000 = {hasil}")
+            elif satuan_awal == "PPM" and satuan_akhir == "PPB":
+                st.write(f"Hasil = {nilai} × 1000 = {hasil}")
+            elif satuan_awal == "PPB" and satuan_akhir == "PPM":
+                st.write(f"Hasil = {nilai} / 1000 = {hasil}")
+
 if menu == "Atom Relatif":
     st.header("Atom Relatif / Mr")
     rumus = st.text_input("Masukkan rumus senyawa (contoh: H2SO4, NaCl, C6H12O6)")
@@ -186,6 +222,13 @@ if menu == "Atom Relatif":
             with st.expander("Detail Atom"):
                 for elemen, jumlah in detail.items():
                     st.write(f"{elemen}: {jumlah} × {periodik[elemen]} = {jumlah * periodik[elemen]:.3f} g")
+            with st.expander("Cara Perhitungan Atom Relatif"):
+                st.write(f"""
+                1. **Hitung Mr (Massa Relatif)**:
+                   - Gunakan rumus senyawa untuk menghitung massa relatif berdasarkan komposisi elemen.
+                   - Contoh: {rumus} = {mr} g/mol
+                """)
+
         except Exception as e:
             st.error(str(e))
 
