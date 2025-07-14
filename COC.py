@@ -126,31 +126,24 @@ if menu == "Penimbangan":
                 volume_l = volume_ml / 1000
                 if satuan == "Molaritas (mol/L)":
                     massa = konsentrasi * volume_l * mr
+                    rumus_perhitungan = f"Massa = Konsentrasi × Volume × Mr = {konsentrasi} × {volume_l:.3f} × {mr} = {massa:.4f} g"
                 elif satuan == "Normalitas (grek/L)":
                     massa = konsentrasi * volume_l * be
+                    rumus_perhitungan = f"Massa = Konsentrasi × Volume × BE = {konsentrasi} × {volume_l:.3f} × {be} = {massa:.4f} g"
                 elif satuan == "% (b/v)":
                     massa = konsentrasi * volume_l * 10
+                    rumus_perhitungan = f"Massa = Konsentrasi × Volume × 10 = {konsentrasi} × {volume_l:.3f} × 10 = {massa:.4f} g"
                 elif satuan == "PPM":
                     massa = konsentrasi * volume_l / 1000
+                    rumus_perhitungan = f"Massa = Konsentrasi × Volume / 1000 = {konsentrasi} × {volume_l:.3f} / 1000 = {massa:.4f} g"
                 elif satuan == "PPB":
                     massa = konsentrasi * volume_l / 1_000_000
+                    rumus_perhitungan = f"Massa = Konsentrasi × Volume / 1,000,000 = {konsentrasi} × {volume_l:.3f} / 1,000,000 = {massa:.4f} g"
                 
                 st.success(f"Massa yang harus ditimbang: {massa:.4f} g")
                 
                 with st.expander("Cara Perhitungan"):
-                    st.write(f"""
-                    1. **Hitung Mr (Massa Molar)**: 
-                       - Mr dari {rumus} = {mr} g/mol
-                    2. **Hitung Berat Ekivalen (BE)**:
-                       - BE = Mr / Valensi = {mr} / {valensi} = {be} g/grek
-                    3. **Hitung Massa**:
-                       - Berdasarkan satuan konsentrasi yang dipilih:
-                         - Molaritas: Massa = Konsentrasi × Volume × Mr = {konsentrasi} × {volume_l:.3f} × {mr} = {massa:.4f} g
-                         - Normalitas: Massa = Konsentrasi × Volume × BE = {konsentrasi} × {volume_l:.3f} × {be} = {massa:.4f} g
-                         - % (b/v): Massa = Konsentrasi × Volume × 10 = {konsentrasi} × {volume_l:.3f} × 10 = {massa:.4f} g
-                         - PPM: Massa = Konsentrasi × Volume / 1000 = {konsentrasi} × {volume_l:.3f} / 1000 = {massa:.4f} g
-                         - PPB: Massa = Konsentrasi × Volume / 1,000,000 = {konsentrasi} × {volume_l:.3f} / 1,000,000 = {massa:.4f} g
-                    """)
+                    st.write(rumus_perhitungan)
 
             except Exception as e:
                 st.error(str(e))
