@@ -52,6 +52,15 @@ periodik = {
     "Hg": 200.59, "Tl": 204.38, "Pb": 207.2, "Bi": 208.98, "Th": 232.04, "U": 238.03
 }
 
+# Database senyawa umum dengan berat ekivalen
+common_compounds = {
+    "HCl": {"type": "acid", "H+": 1, "be": 36.46},
+    "H2SO4": {"type": "acid", "H+": 2, "be": 49.04},
+    "NaOH": {"type": "base", "OH-": 1, "be": 40.00},
+    "HNO3": {"type": "acid", "H+": 1, "be": 63.01},
+    "KOH": {"type": "base", "OH-": 1, "be": 56.11},
+}
+
 # Fungsi parsing rumus dengan hidrasi
 def parse_formula(rumus):
     def extract(tokens):
@@ -199,7 +208,7 @@ elif menu == "Konversi":
     st.header("Konversi Satuan")
     st.subheader("Konversi Konsentrasi")
     value = st.number_input("Masukkan nilai konsentrasi:")
-    from_unit = st.selectbox("Dari satuan:", ["Molaritas (g/mol)", "Normalitas (g/grek)", "% (b/v)", "PPM (mg/L)"])
+    from_unit = st.selectbox("Dari satuan:", ["Molaritas (g/mol)", "Normalitas (g/grek)", "% (b/v)", "PPM (mg/L)", "PPB (µg/L)"])
     to_unit = st.selectbox("Ke satuan:", ["Molaritas (g/mol)", "Normalitas (g/grek)", "% (b/v)", "PPM (mg/L)", "PPB (µg/L)"])
     
     if st.button("Konversi"):
