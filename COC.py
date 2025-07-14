@@ -92,7 +92,7 @@ def hitung_mr(rumus):
 menu = st.sidebar.radio("Navigasi", ["Home", "Penimbangan", "Pengenceran", "Konversi", "Atom Relatif", "Tentang Kami"])
 
 if menu == "Home":
-    st.title("COC - Calculate Of Concentration")
+    st.title("COC - Calculate Of Concentration💻✨")
     st.subheader("Selamat datang di aplikasi COC")
     st.write("""
         Aplikasi ini dirancang untuk mempermudah pengguna dalam menghitung parameter kimia larutan, seperti:
