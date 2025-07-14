@@ -107,6 +107,33 @@ if menu == "Home":
         Selamat mencoba!
     """)
 
+if menu == "Penimbangan":
+    st.header("Penimbangan Zat")
+    rumus = st.text_input("Masukkan rumus senyawa (contoh: H2SO4, NaOH, KMnO4)")
+    satuan = st.selectbox("Pilih satuan konsentrasi:", ["Molaritas (mol/L)", "Normalitas (grek/L)"])
+    konsentrasi = st.number_input("Masukkan konsentrasi:")
+    volume_ml = st.number_input("Masukkan volume larutan (dalam mL):")
+
+    if rumus:
+        try:
+            mr, detail = hitung_mr(rumus)
+            be, valensi = hitung_berat_ekivalen(rumus, mr)
+            st.success(f"Mr dari {rumus} = {mr} g/mol")
+            st.info(f"Berat Ekivalen (BE) dari {rumus} = {be} g/grek (Valensi = {valensi})")
+
+            volume_l = volume_ml / 1000
+            if satuan == "Molaritas (mol/L)":
+                massa = konsentrasi * volume_l * mr
+                st.success(f"Massa = {konsentrasi} mol/L × {volume_l} L × {mr} g/mol = {massa:.4f} g")
+            else:
+                massa = konsentrasi * volume_l * be
+                st.success(f"Massa = {konsentrasi} grek/L × {volume_l} L × {be} g/grek = {massa:.4f} g")
+        except Exception as e:
+            st.error(str(e))
+
+    if st.button("Kembali ke Home"):
+        st.experimental_rerun()
+
 if menu == "Pengenceran":
     st.header("Pengenceran Larutan")
     pilihan = st.radio("Ingin menentukan apa?", ["Volume Awal (V1)", "Konsentrasi Awal (C1)"])
@@ -156,3 +183,17 @@ if menu == "Atom Relatif":
                     st.write(f"{elemen}: {jumlah} × {periodik[elemen]} = {jumlah * periodik[elemen]:.3f} g")
         except Exception as e:
             st.error(str(e))
+
+if menu == "Tentang Kami":
+    st.header("Tentang Kami")
+    st.write("""
+    Aplikasi ini dikembangkan oleh:
+
+    - Andi Muhammad Tegar A A 2460322
+    - Inezza Azmi Tobri       2460390
+    - Muhammad Habibie Rasyha 2460438
+    - Saskia Putri Irfani     2460512
+    - Zahra Nandya Putri N    2460543
+
+    Politeknik AKA Bogor - Kimia Analisis
+    """)
