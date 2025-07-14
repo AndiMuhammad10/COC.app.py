@@ -49,7 +49,58 @@ berat_ekivalen = {
     "CH3COOH": 60
 }
 
-# Sisa fungsi-fungsi dan menu lainnya tidak berubah, lanjutkan seperti sebelumnya.
-# Jika ingin ditambahkan halaman baru (seperti Titrasi atau visualisasi), tinggal buat menu baru.
+# Navigasi sementara
+menu = st.sidebar.radio("Menu", ["Home", "Penimbangan", "Pengenceran", "Konversi", "Tentang Kami"])
 
-st.success("Revisi selesai: tampilan futuristik, font Orbitron, penyesuaian satuan, dan konversi aktif!")
+if menu == "Home":
+    st.title("COC - Calculate Of Concentration")
+    st.subheader("Selamat datang di aplikasi COC")
+    st.markdown("""
+        **Apa itu COC?**
+        
+        _COC (Calculate Of Concentration)_ adalah aplikasi interaktif untuk membantu menghitung konsentrasi kimia larutan, mulai dari penimbangan, pengenceran, hingga konversi satuan.
+        
+        **Konsep Dasar:**
+        Aplikasi ini berbasis pada prinsip **stoikiometri**, yaitu perbandingan kuantitatif zat dalam reaksi kimia. Dalam laboratorium, stoikiometri sangat penting untuk:
+        - Menentukan massa zat yang harus ditimbang
+        - Menghitung pengenceran dari larutan induk
+        - Konversi antar satuan (mol/L, grek/L, ppm, ppb, %)
+
+        Didesain untuk mahasiswa dan profesional kimia agar lebih efisien dan presisi.
+    """)
+    st.button("Kembali ke Beranda")
+
+elif menu == "Konversi":
+    st.header("Konversi Konsentrasi")
+    nilai = st.number_input("Masukkan nilai konsentrasi:")
+    satuan_asal = st.selectbox("Dari satuan:", ["mol/L", "grek/L", "%", "ppm", "ppb"])
+    satuan_tujuan = st.selectbox("Ke satuan:", ["mol/L", "grek/L", "%", "ppm", "ppb"])
+
+    hasil = None
+    if satuan_asal == satuan_tujuan:
+        hasil = nilai
+    else:
+        if satuan_asal == "%":
+            nilai = nilai * 10_000  # diasumsikan % b/v (g/100 mL) menjadi mg/L
+        elif satuan_asal == "ppm":
+            nilai = nilai
+        elif satuan_asal == "ppb":
+            nilai = nilai / 1_000
+        elif satuan_asal == "mol/L":
+            nilai = nilai * 1_000  # jadi mmol/L
+        elif satuan_asal == "grek/L":
+            nilai = nilai * 1_000
+
+        if satuan_tujuan == "%":
+            hasil = nilai / 10_000
+        elif satuan_tujuan == "ppm":
+            hasil = nilai
+        elif satuan_tujuan == "ppb":
+            hasil = nilai * 1_000
+        elif satuan_tujuan == "mol/L":
+            hasil = nilai / 1_000
+        elif satuan_tujuan == "grek/L":
+            hasil = nilai / 1_000
+
+    if hasil is not None:
+        st.success(f"Hasil konversi: {hasil:.4f} {satuan_tujuan}")
