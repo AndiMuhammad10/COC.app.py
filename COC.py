@@ -135,6 +135,21 @@ if menu == "Penimbangan":
             except Exception as e:
                 st.error(str(e))
 
+    with st.expander("Cara Perhitungan Penimbangan"):
+        st.write("""
+        1. **Hitung Mr (Massa Molar)**: 
+           - Gunakan rumus senyawa untuk menghitung massa molar.
+        2. **Hitung Berat Ekivalen (BE)**:
+           - BE = Mr / Valensi
+        3. **Hitung Massa**:
+           - Berdasarkan satuan konsentrasi yang dipilih:
+             - Molaritas: Massa = Konsentrasi × Volume × Mr
+             - Normalitas: Massa = Konsentrasi × Volume × BE
+             - % (b/v): Massa = Konsentrasi × Volume × 10
+             - PPM: Massa = Konsentrasi × Volume / 1000
+             - PPB: Massa = Konsentrasi × Volume / 1,000,000
+        """)
+
 if menu == "Pengenceran":
     st.header("Pengenceran Larutan")
     pilihan = st.radio("Ingin menentukan apa?", ["Volume Awal (V1)", "Konsentrasi Awal (C1)"])
@@ -147,6 +162,7 @@ if menu == "Pengenceran":
             v1 = (v2 * c2) / c1
             st.success(f"Volume awal (V1) yang dibutuhkan: {v1:.2f} mL")
             st.code(f"V1 = (V2 × C2) / C1 = ({v2} × {c2}) / {c1} = {v1}")
+
     else:
         v1 = st.number_input("Masukkan Volume Awal (V1) dalam mL:")
         c2 = st.number_input("Masukkan Konsentrasi Yang Diinginkan (C2):")
@@ -155,6 +171,14 @@ if menu == "Pengenceran":
             c1 = (v2 * c2) / v1
             st.success(f"Konsentrasi awal (C1) yang dibutuhkan: {c1:.2f}")
             st.code(f"C1 = (V2 × C2) / V1 = ({v2} × {c2}) / {v1} = {c1}")
+
+    with st.expander("Cara Perhitungan Pengenceran"):
+        st.write("""
+        1. **Volume Awal (V1)**:
+           - V1 = (V2 × C2) / C1
+        2. **Konsentrasi Awal (C1)**:
+           - C1 = (V2 × C2) / V1
+        """)
 
 if menu == "Konversi":
     st.header("Konversi Satuan Konsentrasi")
@@ -176,6 +200,17 @@ if menu == "Konversi":
             hasil = nilai / 1000
         st.success(f"Hasil konversi dari {satuan_awal} ke {satuan_akhir} adalah: {hasil}")
 
+    with st.expander("Cara Perhitungan Konversi"):
+        st.write("""
+        1. **Konversi Satuan**:
+           - Jika satuan awal dan akhir sama, hasil = nilai.
+           - Jika satuan berbeda, gunakan rumus konversi yang sesuai:
+             - % (b/v) ke PPM: Hasil = Nilai × 10000
+             - PPM ke % (b/v): Hasil = Nilai / 10000
+             - PPM ke PPB: Hasil = Nilai × 1000
+             - PPB ke PPM: Hasil = Nilai / 1000
+        """)
+
 if menu == "Atom Relatif":
     st.header("Atom Relatif / Mr")
     rumus = st.text_input("Masukkan rumus senyawa (contoh: H2SO4, NaCl, C6H12O6)")
@@ -188,6 +223,12 @@ if menu == "Atom Relatif":
                     st.write(f"{elemen}: {jumlah} × {periodik[elemen]} = {jumlah * periodik[elemen]:.3f} g")
         except Exception as e:
             st.error(str(e))
+
+    with st.expander("Cara Perhitungan Atom Relatif"):
+        st.write("""
+        1. **Hitung Mr (Massa Relatif)**:
+           - Gunakan rumus senyawa untuk menghitung massa relatif berdasarkan komposisi elemen.
+        """)
 
 if menu == "Tentang Kami":
     st.header("Tentang Kami")
