@@ -9,15 +9,18 @@ st.markdown("""
     @import url('https://fonts.googleapis.com/css2?family=Orbitron&display=swap');
     html, body, [class*="css"]  {
         font-family: 'Orbitron', sans-serif;
-        background: linear-gradient(-45deg, #000000, #660099);
+        background: linear-gradient(-45deg, #000000, #006600);
         background-size: 400% 400%;
         animation: gradient 15s ease infinite;
-        color: white;
+        color: #00FF00; /* Warna font hijau cerah */
     }
     @keyframes gradient {
         0% {background-position: 0% 50%;}
         50% {background-position: 100% 50%;}
         100% {background-position: 0% 50%;}
+    }
+    h1, h2, h3, h4, h5, h6 {
+        color: #00FF00; /* Warna judul hijau cerah */
     }
     </style>
 """, unsafe_allow_html=True)
@@ -238,12 +241,4 @@ if menu == "Tentang Kami":
     <div style="border: 2px solid white; padding: 15px; border-radius: 10px;">
     <p>Aplikasi ini dikembangkan oleh:</p>
     <ul>
-      <li>Andi Muhammad Tegar A A - 2460322</li>
-      <li>Inezza Azmi Tobri - 2460390</li>
-      <li>Muhammad Habibie Rasyha - 2460438</li>
-      <li>Saskia Putri Irfani - 2460512</li>
-      <li>Zahra Nandya Putri N - 2460543</li>
-    </ul>
-    <p>Politeknik AKA Bogor - Kimia Analisis</p>
-    </div>
-    """, unsafe_allow_html=True)
+      <li>Andi
