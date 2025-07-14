@@ -152,10 +152,11 @@ elif menu == "Tentang Kami":
     st.write("""
     Aplikasi ini dikembangkan oleh:
 
-    - Regant Tegar (NIM: 12345678)
-    - Teman 1 (NIM: 23456789)
-    - Teman 2 (NIM: 34567890)
-    - Teman 3 (NIM: 45678901)
+    - Andi Muhammad Tegar A A 2460322
+    - Inezza Azmi Tobri       2460390
+    - Muhammad Habibie Rasyha 2460438
+    - Saskia Putri Irfani     2460512
+    - Zahra Nandya Putri N    2460543
 
-    Mahasiswa AKA Bogor - Kimia Analisis
+    Politkenik  AKA Bogor - Kimia Analisis
     """)
