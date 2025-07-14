@@ -3,6 +3,20 @@ import re
 
 st.set_page_config(page_title="COC - Calculate Of Concentration", layout="wide")
 
+# Custom CSS for background and font
+st.markdown(
+    """
+    <style>
+    body {
+        background: linear-gradient(135deg, #4B0082, #8A2BE2);
+        color: white;
+        font-family: 'Courier New', Courier, monospace;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
+
 # Tabel Periodik Lengkap
 periodik = {
     "H": 1.008, "He": 4.0026, "Li": 6.94, "Be": 9.0122, "B": 10.81, "C": 12.011,
@@ -22,7 +36,6 @@ periodik = {
 }
 
 # Fungsi parsing rumus dengan tanda kurung dan hidrasi
-
 def parse_formula(rumus):
     def extract(tokens):
         stack = [[]]
@@ -45,6 +58,8 @@ def parse_formula(rumus):
             i += 1
         return stack[0]
 
+    # Replace hydrated compounds
+    rumus = re.sub(r'\((\w+)\)(\d+)', lambda m: f"{m.group(2)}{m.group(1)}", rumus)
     tokens = re.findall(r'[A-Z][a-z]?|\d+|\(|\)', rumus)
     elements = extract(tokens)
     hasil = {}
@@ -55,21 +70,21 @@ def parse_formula(rumus):
     return hasil
 
 # Hitung Mr dari hasil parsing
-
 def hitung_mr(rumus):
     komposisi = parse_formula(rumus)
     total = sum(periodik[el] * jumlah for el, jumlah in komposisi.items())
     return round(total, 3), komposisi
 
 # Fungsi menghitung massa dari konsentrasi
-
-def hitung_gram(mr, konsentrasi, volume_l, satuan):
+def hitung_gram(mr, konsentrasi, volume_l, satuan, berat_ekivalen=None):
     if satuan == "Molaritas (g/mol)":
         mol = konsentrasi * volume_l
         return mol * mr, f"mol = {konsentrasi} mol/L × {volume_l} L = {mol} mol\nMassa = {mol} mol × {mr} g/mol = {mol * mr} g"
     elif satuan == "Normalitas (g/grek)":
+        if berat_ekivalen is None:
+            raise ValueError("Berat ekivalen harus diberikan untuk Normalitas.")
         grek = konsentrasi * volume_l
-        return grek * mr, f"grek = {konsentrasi} grek/L × {volume_l} L = {grek} grek\nMassa = {grek} grek × {mr} g/grek = {grek * mr} g"
+        return grek * berat_ekivalen, f"grek = {konsentrasi} grek/L × {volume_l} L = {grek} grek\nMassa = {grek} grek × {berat_ekivalen} g/grek = {grek * berat_ekivalen} g"
     elif satuan == "% (b/v)":
         return konsentrasi * volume_l * 10, f"Massa = {konsentrasi}% × {volume_l} L × 10 = {konsentrasi * volume_l * 10} g"
     elif satuan == "PPM (mg/L)":
@@ -77,7 +92,6 @@ def hitung_gram(mr, konsentrasi, volume_l, satuan):
         return mg / 1000, f"Massa = {konsentrasi} mg/L × {volume_l} L = {mg} mg = {mg / 1000} g"
 
 # Fungsi pengenceran
-
 def hitung_pengenceran(v1=None, c1=None, v2=None, c2=None):
     if v1 is None:
         return (v2 * c2) / c1, f"V1 = (V2 × C2) / C1 = ({v2} × {c2}) / {c1} = {(v2 * c2) / c1}"
@@ -85,7 +99,7 @@ def hitung_pengenceran(v1=None, c1=None, v2=None, c2=None):
         return (v2 * c2) / v1, f"C1 = (V2 × C2) / V1 = ({v2} × {c2}) / {v1} = {(v2 * c2) / v1}"
 
 # Sidebar navigation
-menu = st.sidebar.radio("Navigasi", ["Home", "Penimbangan", "Pengenceran", "Tentang Kami"])
+menu = st.sidebar.radio("Navigasi", ["Home", "Penimbangan", "Pengenceran", "Konversi", "Tentang Kami"])
 
 # Tampilan halaman
 if menu == "Home":
@@ -96,12 +110,17 @@ if menu == "Home":
         - Penimbangan larutan berdasarkan konsentrasi
         - Pengenceran larutan
 
-        Materi ini berkaitan erat dengan stoikiometri, yaitu ilmu yang mempelajari perbandingan kuantitatif antara reaktan dan produk dalam reaksi kimia.
+        Materi ini berkaitan erat dengan stoikiometri, yaitu ilmu yang mempelajari perbandingan kuantitatif antara reaktan dan produk dalam reaksi kimia. 
+        Stoikiometri sangat penting dalam kimia analisis karena membantu kita memahami bagaimana zat-zat berinteraksi dan berapa banyak yang diperlukan untuk mencapai reaksi yang diinginkan.
+
+        Aplikasi ini juga memungkinkan Anda untuk melakukan konversi antara berbagai satuan konsentrasi, sehingga memudahkan dalam perhitungan laboratorium.
     """)
 
 elif menu == "Penimbangan":
     st.header("Penimbangan Zat")
     senyawa = st.text_input("Masukkan rumus kimia senyawa (contoh: K2Cr2O7, Fe(OH)3, CuSO4.(H2O)5")
+    berat_ekivalen = st.number_input("Masukkan Berat Ekivalen (g/grek) jika menggunakan Normalitas:", min_value=0.0)
+
     try:
         if senyawa:
             mr, detail = hitung_mr(senyawa)
@@ -119,10 +138,13 @@ elif menu == "Penimbangan":
 
     if st.button("Hitung Massa") and mr is not None:
         volume_l = volume_ml / 1000
-        hasil, penjelasan = hitung_gram(mr, konsentrasi, volume_l, satuan)
+        hasil, penjelasan = hitung_gram(mr, konsentrasi, volume_l, satuan, berat_ekivalen if satuan == "Normalitas (g/grek)" else None)
         st.success(f"Massa {senyawa} yang harus ditimbang: {hasil:.4f} g")
         with st.expander("Lihat Perhitungan"):
             st.code(penjelasan)
+
+    if st.button("Beranda"):
+        st.experimental_rerun()
 
 elif menu == "Pengenceran":
     st.header("Pengenceran Larutan")
@@ -147,6 +169,12 @@ elif menu == "Pengenceran":
             with st.expander("Lihat Perhitungan"):
                 st.code(penjelasan)
 
+elif menu == "Konversi":
+    st.header("Konversi Satuan")
+    # Add conversion logic here
+    # For example, you can create input fields for different conversions
+    st.write("Fitur konversi akan ditambahkan di sini.")
+
 elif menu == "Tentang Kami":
     st.header("Tentang Kami")
     st.write("""
@@ -159,7 +187,7 @@ elif menu == "Tentang Kami":
     - Zahra Nandya Putri N    2460543
 
     Politkenik  AKA Bogor - Kimia Analisis
+
+    Proyek ini bertujuan untuk memberikan alat bantu yang efisien dalam perhitungan konsentrasi dan pengenceran larutan, serta memberikan pemahaman yang lebih baik tentang stoikiometri dalam kimia.
     """)
-
-
 
