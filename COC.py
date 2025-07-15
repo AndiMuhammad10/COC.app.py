@@ -88,7 +88,7 @@ def hitung_mr(rumus):
     total = sum(periodik[el] * jumlah for el, jumlah in komposisi.items())
     return round(total, 3), komposisi
 
-menu = st.sidebar.radio("Navigasi", ["Home", "Penimbangan", "Pengenceran", "Konversi", "Atom Relatif", "Tentang Kami"])
+menu = st.sidebar.radio("Navigasi", ["Home", "Penimbangan", "Pengenceran", "Normalitas / Molaritas", "Atom Relatif", "Tentang Kami"])
 
 if menu == "Home":
     st.title("COC - Calculate Of Concentration")
@@ -97,7 +97,7 @@ if menu == "Home":
         Aplikasi ini dirancang untuk mempermudah pengguna dalam menghitung parameter kimia larutan, seperti:
         - Penimbangan berdasarkan konsentrasi
         - Pengenceran larutan
-        - Konversi antar satuan
+        - Perhitungan normalitas dan molaritas (standarisasi)
         - Informasi atom relatif (Mr)
 
         COC sangat membantu dalam pembelajaran stoikiometri, yaitu perhitungan kuantitatif antar zat dalam reaksi kimia.
@@ -184,15 +184,41 @@ if menu == "Pengenceran":
             st.success(f"Konsentrasi awal (C1) yang dibutuhkan: {c1:.2f}")
             st.code(f"C1 = (V2 × C2) / V1 = ({v2} × {c2}) / {v1} = {c1}")
 
-if menu == "Konversi":
-    st.header("Konversi Satuan Konsentrasi")
-    nilai = st.number_input("Masukkan nilai konsentrasi:")
-    satuan_awal = st.selectbox("Satuan Awal", ["Molaritas (mol/L)", "Normalitas (grek/L)", "% (b/v)", "PPM", "PPB"])
-    satuan_akhir = st.selectbox("Satuan Akhir", ["Molaritas (mol/L)", "Normalitas (grek/L)", "% (b/v)", "PPM", "PPB"])
-
-    if st.button("Konversi"):
-        hasil = nilai  # Placeholder sementara
-        st.success(f"Hasil konversi dari {satuan_awal} ke {satuan_akhir} adalah: {hasil} (fungsi belum lengkap)")
+if menu == "Normalitas / Molaritas":
+    st.header("Perhitungan Normalitas (N) dan Molaritas (M) - Standarisasi")
+    jenis = st.selectbox("Pilih jenis perhitungan:", ["Normalitas (N)", "Molaritas (M)"])
+    
+    mg_baku = st.number_input("Masukkan massa baku primer (mg):", min_value=0.0, format="%.4f")
+    volume_titrasi_ml = st.number_input("Masukkan volume titrasi (mL):", min_value=0.0, format="%.4f")
+    faktor_pengali = st.number_input("Masukkan Faktor Pengali (Fp):", min_value=0.0, value=1.0, format="%.4f")
+    
+    # Input rumus senyawa untuk hitung BE atau BM
+    rumus_standar = st.text_input("Masukkan rumus senyawa baku primer (contoh: H2SO4, NaOH):")
+    
+    if st.button("Hitung"):
+        if not rumus_standar:
+            st.error("Rumus senyawa baku primer harus diisi!")
+        else:
+            try:
+                mr, _ = hitung_mr(rumus_standar)
+                be, _ = hitung_berat_ekivalen(rumus_standar, mr)
+                volume_titrasi_l = volume_titrasi_ml / 1000
+                if volume_titrasi_l == 0 or faktor_pengali == 0:
+                    st.error("Volume titrasi dan Faktor Pengali tidak boleh nol.")
+                else:
+                    if jenis == "Normalitas (N)":
+                        normalitas = (mg_baku / 1000) / (be * volume_titrasi_l * faktor_pengali)
+                        st.success(f"Normalitas larutan adalah: {normalitas:.6f} N")
+                        st.code(f"N = (mg / 1000) ÷ (BE × volume titrasi (L) × Fp) = ({mg_baku} / 1000) ÷ ({be} × {volume_titrasi_l} × {faktor_pengali}) = {normalitas:.6f} N")
+                        st.info(f"BE (Berat Ekivalen) untuk {rumus_standar} = {be} g/grek")
+                    else:  # Molaritas (M)
+                        bm = mr
+                        molaritas = (mg_baku / 1000) / (bm * volume_titrasi_l * faktor_pengali)
+                        st.success(f"Molaritas larutan adalah: {molaritas:.6f} M")
+                        st.code(f"M = (mg / 1000) ÷ (BM × volume titrasi (L) × Fp) = ({mg_baku} / 1000) ÷ ({bm} × {volume_titrasi_l} × {faktor_pengali}) = {molaritas:.6f} M")
+                        st.info(f"BM (Berat Molekul) untuk {rumus_standar} = {bm} g/mol")
+            except Exception as e:
+                st.error(f"Terjadi kesalahan: {e}")
 
 if menu == "Atom Relatif":
     st.header("Atom Relatif / Mr")
