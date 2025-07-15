@@ -319,4 +319,3 @@ if menu == "Tentang Kami":
     <p>Politeknik AKA Bogor - Kimia Analisis</p>
     </div>
     """, unsafe_allow_html=True)
-
