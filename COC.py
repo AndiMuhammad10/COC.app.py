@@ -5,18 +5,137 @@ st.set_page_config(page_title="COC - Calculate Of Concentration", layout="wide")
 
 # CSS styling modern futuristik
 st.markdown("""
-    <style>
-    @import url('https://fonts.googleapis.com/css2?family=Orbitron&display=swap');
-    html, body, [class*="css"]  {
-        font-family: 'Orbitron', sans-serif;
-        background-color: #660066; /* Latar belakang ungu */
-        color: #00FF00; /* Warna font hijau cerah */
-    }
-    h1, h2, h3, h4, h5, h6 {
-        color: #00FF00; /* Warna judul hijau cerah */
-    }
-    </style>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
+
+html, body, [class*="css"] {
+    font-family: 'Orbitron', sans-serif;
+}
+
+/* Background Animasi - Biru Muda ke Putih */
+.stApp {
+    background: linear-gradient(-45deg, #d9f3ff, #ffffff, #cceeff, #ffffff);
+    background-size: 400% 400%;
+    animation: gradient 20s ease infinite;
+    color: #000000;
+}
+
+@keyframes gradient {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+/* Sidebar */
+section[data-testid="stSidebar"] {
+    background: linear-gradient(to bottom, #e8f9ff, #ffffff);
+    padding: 25px 20px;
+    min-width: 240px;
+    max-width: 260px;
+    border-right: 2px solid #80dfff;
+    box-shadow: 4px 0 15px rgba(0, 140, 255, 0.2);
+}
+
+section[data-testid="stSidebar"] * {
+    color: #003366 !important;
+}
+
+/* Label Navigasi */
+section[data-testid="stSidebar"] label {
+    font-size: 16px;
+    margin-bottom: 12px;
+}
+
+/* Navigasi Radio Button */
+section[data-testid="stSidebar"] .stRadio > div > label[data-baseweb="radio"] {
+    padding: 8px 14px;
+    margin-bottom: 6px;
+    border-radius: 12px;
+    background-color: rgba(0, 51, 102, 0.06);
+    transition: all 0.3s ease;
+    color: #003366 !important;
+}
+
+section[data-testid="stSidebar"] .stRadio > div > label[data-baseweb="radio"]:hover {
+    background-color: rgba(0, 51, 102, 0.12);
+    transform: translateX(4px);
+}
+
+section[data-testid="stSidebar"] .stRadio > div > label[data-baseweb="radio"][aria-checked="true"] {
+    background: linear-gradient(to right, #80dfff, #b3ecff);
+    color: #003366 !important;
+    font-weight: bold;
+    box-shadow: 0 0 8px #99e6ff;
+}
+
+/* Heading */
+h1, h2, h3 {
+    color: #003366;
+    text-shadow: 0 0 5px #b3ecff;
+}
+
+/* Label Input */
+label, .css-1cpxqw2 {
+    color: #003366 !important;
+}
+
+/* Input dan Select */
+input[type="text"], input[type="number"], .stTextInput > div > input,
+.stNumberInput > div > input, .stSelectbox > div > div {
+    background-color: #ffffff;
+    color: #003366;
+    border: 2px solid #80dfff;
+    border-radius: 8px;
+    padding: 8px;
+    font-weight: bold;
+}
+
+.stSelectbox > div > div {
+    background-color: #f0faff;
+    color: #003366;
+}
+
+/* Tombol */
+.stButton > button {
+    background-color: #b3ecff;
+    color: #003366;
+    font-weight: bold;
+    border: none;
+    border-radius: 10px;
+    padding: 10px 18px;
+    box-shadow: 0 0 8px #99e6ff;
+    transition: 0.3s ease-in-out;
+}
+
+.stButton > button:hover {
+    background-color: #e0faff;
+    color: #000;
+    box-shadow: 0 0 10px #ffffff;
+    transform: scale(1.03);
+}
+
+/* Output Box */
+.stAlert {
+    background-color: rgba(0, 0, 0, 0.03);
+    border-left: 4px solid #80dfff;
+}
+
+.st-expanderHeader {
+    color: #003366;
+}
+
+.css-10trblm, .css-1v0mbdj {
+    color: #004466;
+}
+
+.stRadio label:has(span:contains("Ingin menentukan apa?")) span {
+    color: #007acc !important;
+    font-weight: bold !important;
+    text-shadow: 0 0 5px #ccf2ff;
+}
+</style>
 """, unsafe_allow_html=True)
+
 
 # Tabel Periodik Lengkap
 periodik = {
@@ -38,15 +157,11 @@ periodik = {
 
 # Data valensi tambahan
 valensi_data = {
-    "HCl": 1, "H2SO4": 2, "HNO3": 1, "CH3COOH": 1, "H3PO4": 3, "H2CO3": 2,
-    "H2S": 2, "H2C2O4": 2, "HClO3": 1, "H2CrO4": 2,
-    "NaOH": 1, "KOH": 1, "Ca(OH)2": 2, "Mg(OH)2": 2, "Ba(OH)2": 2, "LiOH": 1,
-    "NH4OH": 1, "Al(OH)3": 3, "Sr(OH)2": 2, "Fe(OH)3": 3,
-    "NaCl": 1, "K2SO4": 2, "Na2CO3": 2, "CaCl2": 2, "MgSO4": 2, "NH4Cl": 1,
-    "NaHCO3": 1, "KNO3": 1, "AgNO3": 1, "Ca3(PO4)2": 3,
-    "KMnO4": 5, "Na2Cr2O7": 6, "H2O2": 1, "Fe2O3": 3, "CuSO4": 2, "NH4NO3": 1,
-    "Na2S2O3": 2, "CoCl2": 2, "HClO4": 1, "K2Cr2O7": 6,
-    "HClO": 1, "H3BO3": 3, "CH3COOK": 1, "ZnCl2": 2, "Na3PO4": 3, "Li2CO3": 2
+    "HCl": 1, "HNO3": 1, "H2SO4": 2, "H3PO4": 3, "CH3COOH": 1, "H2CO3": 2,
+    "NaOH": 1, "KOH": 1, "Ca(OH)2": 2, "Ba(OH)2": 2, "Al(OH)3": 3,
+    "NaCl": 1, "K2SO4": 2, "FeCl3": 3,
+    "KMnO4": 5, "K2Cr2O7": 6, "Fe2O3": 3, "Cl2": 2, "H2O2": 2, "CuO": 2,
+    "HBr": 1, "HI": 1, "HClO4": 1, "LiOH": 1, "Mg(OH)2": 2, "Zn(OH)2": 2
 }
 
 def hitung_berat_ekivalen(senyawa, mr):
@@ -92,33 +207,23 @@ def hitung_mr(rumus):
 menu = st.sidebar.radio("Navigasi", ["Home", "Penimbangan", "Pengenceran", "Konversi", "Atom Relatif", "Tentang Kami"])
 
 if menu == "Home":
-    st.title("COC - Calculate Of Concentration💻✨")
+    st.title("COC - Calculate Of Concentration")
     st.subheader("Selamat datang di aplikasi COC")
     st.write("""
+        Aplikasi ini dirancang untuk mempermudah pengguna dalam menghitung parameter kimia larutan, seperti:
+        - Penimbangan berdasarkan konsentrasi
+        - Pengenceran larutan
+        - Konversi antar satuan
+        - Informasi atom relatif (Mr)
 
-Dalam dunia kimia analisis, memahami dan menghitung konsentrasi suatu larutan merupakan keterampilan dasar yang sangat penting. Materi seperti stoikiometri, pengenceran, konversi satuan, hingga perhitungan massa zat berdasarkan molaritas, menjadi bagian tak terpisahkan dari praktikum maupun kegiatan analisis di laboratorium. Namun, tidak sedikit pelajar atau praktisi yang merasa kesulitan ketika harus melakukan perhitungan ini secara manual, apalagi saat menghadapi data yang kompleks atau variatif.
-
-Sebagai respon terhadap kebutuhan tersebut, kami menghadirkan COC - Calculate Of Concentration 💻✨, sebuah aplikasi berbasis web yang dirancang khusus untuk membantu pengguna dalam melakukan berbagai perhitungan kimia larutan dengan cepat dan akurat. Aplikasi ini mencakup fitur:
-
-* Penimbangan berdasarkan konsentrasi
-* Pengenceran larutan
-* Konversi antar satuan
-* Informasi atom relatif (Mr)
-
-COC dikembangkan sebagai bagian dari Tugas Akhir LPK (Logika Pemrograman Komputer ) dengan tujuan memberikan kontribusi nyata dalam pembelajaran dan praktik laboratorium, khususnya di bidang kimia analisis. Dengan antarmuka yang sederhana dan fungsional, diharapkan COC dapat menjadi alat bantu yang efektif bagi mahasiswa, guru, analis, maupun siapa saja yang sedang mempelajari atau bekerja dengan kimia larutan.
-
-Mari manfaatkan aplikasi ini untuk memperkuat pemahaman konsep dan meningkatkan ketelitian dalam perhitungan kimia.
-Selamat menggunakan, dan semoga bermanfaat‼️‼️
-
----
-
-
+        COC sangat membantu dalam pembelajaran stoikiometri, yaitu perhitungan kuantitatif antar zat dalam reaksi kimia.
+        Selamat mencoba!
     """)
 
 if menu == "Penimbangan":
     st.header("Penimbangan Zat")
-    rumus = st.text_input("Masukkan rumus senyawa (contoh: CuSO4(H2O)5, NaOH, KMnO4)")
-    satuan = st.selectbox("Pilih satuan konsentrasi:", ["Molaritas (mol/L)", "Normalitas (grek/L)", "% (b/v)", "Ppm", "Ppb"])
+    rumus = st.text_input("Masukkan rumus senyawa (contoh: H2SO4, NaOH, KMnO4)")
+    satuan = st.selectbox("Pilih satuan konsentrasi:", ["Molaritas (mol/L)", "Normalitas (grek/L)", "% (b/v)", "PPM", "PPB"])
     konsentrasi = st.number_input("Masukkan konsentrasi:")
     volume_ml = st.number_input("Masukkan volume larutan (dalam mL):")
 
@@ -133,25 +238,15 @@ if menu == "Penimbangan":
                 volume_l = volume_ml / 1000
                 if satuan == "Molaritas (mol/L)":
                     massa = konsentrasi * volume_l * mr
-                    rumus_perhitungan = f"Massa = Konsentrasi × Volume × Mr = {konsentrasi} × {volume_l:.3f} × {mr} = {massa:.4f} g"
                 elif satuan == "Normalitas (grek/L)":
                     massa = konsentrasi * volume_l * be
-                    rumus_perhitungan = f"Massa = Konsentrasi × Volume × BE = {konsentrasi} × {volume_l:.3f} × {be} = {massa:.4f} g"
                 elif satuan == "% (b/v)":
                     massa = konsentrasi * volume_l * 10
-                    rumus_perhitungan = f"Massa = Konsentrasi × Volume × 10 = {konsentrasi} × {volume_l:.3f} × 10 = {massa:.4f} g"
                 elif satuan == "PPM":
                     massa = konsentrasi * volume_l / 1000
-                    rumus_perhitungan = f"Massa = Konsentrasi × Volume / 1000 = {konsentrasi} × {volume_l:.3f} / 1000 = {massa:.4f} g"
                 elif satuan == "PPB":
                     massa = konsentrasi * volume_l / 1_000_000
-                    rumus_perhitungan = f"Massa = Konsentrasi × Volume / 1,000,000 = {konsentrasi} × {volume_l:.3f} / 1,000,000 = {massa:.4f} g"
-                
                 st.success(f"Massa yang harus ditimbang: {massa:.4f} g")
-                
-                with st.expander("Cara Perhitungan"):
-                    st.write(rumus_perhitungan)
-
             except Exception as e:
                 st.error(str(e))
 
@@ -166,11 +261,7 @@ if menu == "Pengenceran":
         if st.button("Hitung V1"):
             v1 = (v2 * c2) / c1
             st.success(f"Volume awal (V1) yang dibutuhkan: {v1:.2f} mL")
-            with st.expander("Cara Perhitungan"):
-                st.write(f"""
-                V1 = (V2 × C2) / C1 = ({v2} × {c2}) / {c1} = {v1:.2f} mL
-                """)
-
+            st.code(f"V1 = (V2 × C2) / C1 = ({v2} × {c2}) / {c1} = {v1}")
     else:
         v1 = st.number_input("Masukkan Volume Awal (V1) dalam mL:")
         c2 = st.number_input("Masukkan Konsentrasi Yang Diinginkan (C2):")
@@ -178,10 +269,7 @@ if menu == "Pengenceran":
         if st.button("Hitung C1"):
             c1 = (v2 * c2) / v1
             st.success(f"Konsentrasi awal (C1) yang dibutuhkan: {c1:.2f}")
-            with st.expander("Cara Perhitungan"):
-                st.write(f"""
-                C1 = (V2 × C2) / V1 = ({v2} × {c2}) / {v1} = {c1:.2f}
-                """)
+            st.code(f"C1 = (V2 × C2) / V1 = ({v2} × {c2}) / {v1} = {c1}")
 
 if menu == "Konversi":
     st.header("Konversi Satuan Konsentrasi")
@@ -203,18 +291,6 @@ if menu == "Konversi":
             hasil = nilai / 1000
         st.success(f"Hasil konversi dari {satuan_awal} ke {satuan_akhir} adalah: {hasil}")
 
-        with st.expander("Cara Perhitungan"):
-            if satuan_awal == satuan_akhir:
-                st.write(f"Hasil = {nilai} (sama dengan satuan awal)")
-            elif satuan_awal == "% (b/v)" and satuan_akhir == "PPM":
-                st.write(f"Hasil = {nilai} × 10000 = {hasil}")
-            elif satuan_awal == "PPM" and satuan_akhir == "% (b/v)":
-                st.write(f"Hasil = {nilai} / 10000 = {hasil}")
-            elif satuan_awal == "PPM" and satuan_akhir == "PPB":
-                st.write(f"Hasil = {nilai} × 1000 = {hasil}")
-            elif satuan_awal == "PPB" and satuan_akhir == "PPM":
-                st.write(f"Hasil = {nilai} / 1000 = {hasil}")
-
 if menu == "Atom Relatif":
     st.header("Atom Relatif / Mr")
     rumus = st.text_input("Masukkan rumus senyawa (contoh: H2SO4, NaCl, C6H12O6)")
@@ -225,13 +301,6 @@ if menu == "Atom Relatif":
             with st.expander("Detail Atom"):
                 for elemen, jumlah in detail.items():
                     st.write(f"{elemen}: {jumlah} × {periodik[elemen]} = {jumlah * periodik[elemen]:.3f} g")
-            with st.expander("Cara Perhitungan Atom Relatif"):
-                st.write(f"""
-                1. **Hitung Mr (Massa Relatif)**:
-                   - Gunakan rumus senyawa untuk menghitung massa relatif berdasarkan komposisi elemen.
-                   - Contoh: {rumus} = {mr} g/mol
-                """)
-
         except Exception as e:
             st.error(str(e))
 
