@@ -43,7 +43,7 @@ periodik = {
 valensi_data = {
     "HCl": 1, "HNO3": 1, "H2SO4": 2, "H3PO4": 3, "CH3COOH": 1, "H2CO3": 2,
     "NaOH": 1, "KOH": 1, "Ca(OH)2": 2, "Ba(OH)2": 2, "Al(OH)3": 3,
-    "NaCl": 1, "K2SO4": 2, "FeCl3": 3,
+    "NaCl": 1, "K2SO4": 2, "FeCl3": 3, "H2C2O4" : 2,
     "KMnO4": 5, "K2Cr2O7": 6, "Fe2O3": 3, "Cl2": 2, "H2O2": 2, "CuO": 2,
     "HBr": 1, "HI": 1, "HClO4": 1, "LiOH": 1, "Mg(OH)2": 2, "Zn(OH)2": 2
 }
