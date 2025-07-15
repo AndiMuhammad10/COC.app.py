@@ -40,17 +40,11 @@ periodik = {
     "Hg": 200.59, "Tl": 204.38, "Pb": 207.2, "Bi": 208.98, "Th": 232.04, "U": 238.03
 }
 
-# Data valensi tambahan
 valensi_data = {
-    # Asam kuat dan lemah
     "HCl": 1, "HNO3": 1, "H2SO4": 2, "H3PO4": 3, "CH3COOH": 1, "H2CO3": 2,
-    # Basa kuat dan lemah
     "NaOH": 1, "KOH": 1, "Ca(OH)2": 2, "Ba(OH)2": 2, "Al(OH)3": 3,
-    # Garam
     "NaCl": 1, "K2SO4": 2, "FeCl3": 3,
-    # Oksidator/Redoks
     "KMnO4": 5, "K2Cr2O7": 6, "Fe2O3": 3, "Cl2": 2, "H2O2": 2, "CuO": 2,
-    # Tambahan
     "HBr": 1, "HI": 1, "HClO4": 1, "LiOH": 1, "Mg(OH)2": 2, "Zn(OH)2": 2
 }
 
@@ -113,9 +107,26 @@ if menu == "Home":
 if menu == "Penimbangan":
     st.header("Penimbangan Zat")
     rumus = st.text_input("Masukkan rumus senyawa (contoh: H2SO4, NaOH, KMnO4)")
-    satuan = st.selectbox("Pilih satuan konsentrasi:", ["Molaritas (mol/L)", "Normalitas (grek/L)"])
+    
+    satuan = st.selectbox("Pilih satuan konsentrasi:", [
+        "Molaritas (mol/L)", 
+        "Normalitas (grek/L)", 
+        "PPM", 
+        "PPB", 
+        "% (b/v)"
+    ])
+    
     konsentrasi = st.number_input("Masukkan konsentrasi:")
     volume_ml = st.number_input("Masukkan volume larutan (dalam mL):")
+
+    with st.expander("📘 Penjelasan Satuan Konsentrasi"):
+        st.markdown("""
+        - **Molaritas (mol/L)**: jumlah mol zat per liter larutan
+        - **Normalitas (grek/L)**: ekivalen zat per liter larutan
+        - **PPM**: part per million → setara **mg/L**
+        - **PPB**: part per billion → setara **µg/L**
+        - **% (b/v)**: gram per 100 mL larutan
+        """)
 
     if st.button("Hitung"): 
         if rumus:
@@ -129,9 +140,26 @@ if menu == "Penimbangan":
                 if satuan == "Molaritas (mol/L)":
                     massa = konsentrasi * volume_l * mr
                     st.success(f"Massa = {konsentrasi} mol/L × {volume_l} L × {mr} g/mol = {massa:.4f} g")
-                else:
+                
+                elif satuan == "Normalitas (grek/L)":
                     massa = konsentrasi * volume_l * be
                     st.success(f"Massa = {konsentrasi} grek/L × {volume_l} L × {be} g/grek = {massa:.4f} g")
+                
+                elif satuan == "PPM":
+                    massa = konsentrasi * volume_l / 1000
+                    st.success(f"Massa = {konsentrasi} mg/L × {volume_l} L ÷ 1000 = {massa:.4f} g")
+                    st.info("Catatan: 1 ppm = 1 mg/L, maka massa = ppm × volume (L) ÷ 1000")
+
+                elif satuan == "PPB":
+                    massa = konsentrasi * volume_l / 1_000_000
+                    st.success(f"Massa = {konsentrasi} µg/L × {volume_l} L ÷ 1.000.000 = {massa:.6f} g")
+                    st.info("Catatan: 1 ppb = 1 µg/L, maka massa = ppb × volume (L) ÷ 1.000.000")
+
+                elif satuan == "% (b/v)":
+                    massa = konsentrasi * volume_ml / 100
+                    st.success(f"Massa = {konsentrasi}% × {volume_ml} mL ÷ 100 = {massa:.4f} g")
+                    st.info("Catatan: % b/v = gram per 100 mL, maka massa = % × volume ÷ 100")
+
             except Exception as e:
                 st.error(str(e))
 
@@ -163,7 +191,7 @@ if menu == "Konversi":
     satuan_akhir = st.selectbox("Satuan Akhir", ["Molaritas (mol/L)", "Normalitas (grek/L)", "% (b/v)", "PPM", "PPB"])
 
     if st.button("Konversi"):
-        hasil = nilai  # Placeholder
+        hasil = nilai  # Placeholder sementara
         st.success(f"Hasil konversi dari {satuan_awal} ke {satuan_akhir} adalah: {hasil} (fungsi belum lengkap)")
 
 if menu == "Atom Relatif":
