@@ -5,22 +5,137 @@ st.set_page_config(page_title="COC - Calculate Of Concentration", layout="wide")
 
 # CSS styling modern futuristik
 st.markdown("""
-    <style>
-    @import url('https://fonts.googleapis.com/css2?family=Orbitron&display=swap');
-    html, body, [class*="css"]  {
-        font-family: 'Orbitron', sans-serif;
-        background: linear-gradient(-45deg, #000000, #660099);
-        background-size: 400% 400%;
-        animation: gradient 15s ease infinite;
-        color: white;
-    }
-    @keyframes gradient {
-        0% {background-position: 0% 50%;}
-        50% {background-position: 100% 50%;}
-        100% {background-position: 0% 50%;}
-    }
-    </style>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
+
+html, body, [class*="css"] {
+    font-family: 'Orbitron', sans-serif;
+}
+
+/* Background Animasi - Biru Muda ke Putih */
+.stApp {
+    background: linear-gradient(-45deg, #d9f3ff, #ffffff, #cceeff, #ffffff);
+    background-size: 400% 400%;
+    animation: gradient 20s ease infinite;
+    color: #000000;
+}
+
+@keyframes gradient {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+/* Sidebar */
+section[data-testid="stSidebar"] {
+    background: linear-gradient(to bottom, #e8f9ff, #ffffff);
+    padding: 25px 20px;
+    min-width: 240px;
+    max-width: 260px;
+    border-right: 2px solid #80dfff;
+    box-shadow: 4px 0 15px rgba(0, 140, 255, 0.2);
+}
+
+section[data-testid="stSidebar"] * {
+    color: #003366 !important;
+}
+
+/* Label Navigasi */
+section[data-testid="stSidebar"] label {
+    font-size: 16px;
+    margin-bottom: 12px;
+}
+
+/* Navigasi Radio Button */
+section[data-testid="stSidebar"] .stRadio > div > label[data-baseweb="radio"] {
+    padding: 8px 14px;
+    margin-bottom: 6px;
+    border-radius: 12px;
+    background-color: rgba(0, 51, 102, 0.06);
+    transition: all 0.3s ease;
+    color: #003366 !important;
+}
+
+section[data-testid="stSidebar"] .stRadio > div > label[data-baseweb="radio"]:hover {
+    background-color: rgba(0, 51, 102, 0.12);
+    transform: translateX(4px);
+}
+
+section[data-testid="stSidebar"] .stRadio > div > label[data-baseweb="radio"][aria-checked="true"] {
+    background: linear-gradient(to right, #80dfff, #b3ecff);
+    color: #003366 !important;
+    font-weight: bold;
+    box-shadow: 0 0 8px #99e6ff;
+}
+
+/* Heading */
+h1, h2, h3 {
+    color: #003366;
+    text-shadow: 0 0 5px #b3ecff;
+}
+
+/* Label Input */
+label, .css-1cpxqw2 {
+    color: #003366 !important;
+}
+
+/* Input dan Select */
+input[type="text"], input[type="number"], .stTextInput > div > input,
+.stNumberInput > div > input, .stSelectbox > div > div {
+    background-color: #ffffff;
+    color: #003366;
+    border: 2px solid #80dfff;
+    border-radius: 8px;
+    padding: 8px;
+    font-weight: bold;
+}
+
+.stSelectbox > div > div {
+    background-color: #f0faff;
+    color: #003366;
+}
+
+/* Tombol */
+.stButton > button {
+    background-color: #b3ecff;
+    color: #003366;
+    font-weight: bold;
+    border: none;
+    border-radius: 10px;
+    padding: 10px 18px;
+    box-shadow: 0 0 8px #99e6ff;
+    transition: 0.3s ease-in-out;
+}
+
+.stButton > button:hover {
+    background-color: #e0faff;
+    color: #000;
+    box-shadow: 0 0 10px #ffffff;
+    transform: scale(1.03);
+}
+
+/* Output Box */
+.stAlert {
+    background-color: rgba(0, 0, 0, 0.03);
+    border-left: 4px solid #80dfff;
+}
+
+.st-expanderHeader {
+    color: #003366;
+}
+
+.css-10trblm, .css-1v0mbdj {
+    color: #004466;
+}
+
+.stRadio label:has(span:contains("Ingin menentukan apa?")) span {
+    color: #007acc !important;
+    font-weight: bold !important;
+    text-shadow: 0 0 5px #ccf2ff;
+}
+</style>
 """, unsafe_allow_html=True)
+
 
 # Tabel Periodik Lengkap
 periodik = {
@@ -42,15 +157,10 @@ periodik = {
 
 # Data valensi tambahan
 valensi_data = {
-    # Asam kuat dan lemah
     "HCl": 1, "HNO3": 1, "H2SO4": 2, "H3PO4": 3, "CH3COOH": 1, "H2CO3": 2,
-    # Basa kuat dan lemah
     "NaOH": 1, "KOH": 1, "Ca(OH)2": 2, "Ba(OH)2": 2, "Al(OH)3": 3,
-    # Garam
     "NaCl": 1, "K2SO4": 2, "FeCl3": 3,
-    # Oksidator/Redoks
     "KMnO4": 5, "K2Cr2O7": 6, "Fe2O3": 3, "Cl2": 2, "H2O2": 2, "CuO": 2,
-    # Tambahan
     "HBr": 1, "HI": 1, "HClO4": 1, "LiOH": 1, "Mg(OH)2": 2, "Zn(OH)2": 2
 }
 
@@ -113,7 +223,7 @@ if menu == "Home":
 if menu == "Penimbangan":
     st.header("Penimbangan Zat")
     rumus = st.text_input("Masukkan rumus senyawa (contoh: H2SO4, NaOH, KMnO4)")
-    satuan = st.selectbox("Pilih satuan konsentrasi:", ["Molaritas (mol/L)", "Normalitas (grek/L)"])
+    satuan = st.selectbox("Pilih satuan konsentrasi:", ["Molaritas (mol/L)", "Normalitas (grek/L)", "% (b/v)", "PPM", "PPB"])
     konsentrasi = st.number_input("Masukkan konsentrasi:")
     volume_ml = st.number_input("Masukkan volume larutan (dalam mL):")
 
@@ -128,10 +238,15 @@ if menu == "Penimbangan":
                 volume_l = volume_ml / 1000
                 if satuan == "Molaritas (mol/L)":
                     massa = konsentrasi * volume_l * mr
-                    st.success(f"Massa = {konsentrasi} mol/L × {volume_l} L × {mr} g/mol = {massa:.4f} g")
-                else:
+                elif satuan == "Normalitas (grek/L)":
                     massa = konsentrasi * volume_l * be
-                    st.success(f"Massa = {konsentrasi} grek/L × {volume_l} L × {be} g/grek = {massa:.4f} g")
+                elif satuan == "% (b/v)":
+                    massa = konsentrasi * volume_l * 10
+                elif satuan == "PPM":
+                    massa = konsentrasi * volume_l / 1000
+                elif satuan == "PPB":
+                    massa = konsentrasi * volume_l / 1_000_000
+                st.success(f"Massa yang harus ditimbang: {massa:.4f} g")
             except Exception as e:
                 st.error(str(e))
 
@@ -163,8 +278,18 @@ if menu == "Konversi":
     satuan_akhir = st.selectbox("Satuan Akhir", ["Molaritas (mol/L)", "Normalitas (grek/L)", "% (b/v)", "PPM", "PPB"])
 
     if st.button("Konversi"):
-        hasil = nilai  # Placeholder
-        st.success(f"Hasil konversi dari {satuan_awal} ke {satuan_akhir} adalah: {hasil} (fungsi belum lengkap)")
+        hasil = nilai
+        if satuan_awal == satuan_akhir:
+            hasil = nilai
+        elif satuan_awal == "% (b/v)" and satuan_akhir == "PPM":
+            hasil = nilai * 10000
+        elif satuan_awal == "PPM" and satuan_akhir == "% (b/v)":
+            hasil = nilai / 10000
+        elif satuan_awal == "PPM" and satuan_akhir == "PPB":
+            hasil = nilai * 1000
+        elif satuan_awal == "PPB" and satuan_akhir == "PPM":
+            hasil = nilai / 1000
+        st.success(f"Hasil konversi dari {satuan_awal} ke {satuan_akhir} adalah: {hasil}")
 
 if menu == "Atom Relatif":
     st.header("Atom Relatif / Mr")
