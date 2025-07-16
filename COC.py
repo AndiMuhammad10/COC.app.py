@@ -1,24 +1,115 @@
 import streamlit as st
 import re
+import base64
 
 st.set_page_config(page_title="COC - Calculate Of Concentration", layout="wide")
 
+with open("bg.gif", "rb") as image_file:
+    encoded_gif = base64.b64encode(image_file.read()).decode("utf-8")
+
 # CSS futuristik gradasi
-st.markdown("""
+st.markdown(f"""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Orbitron&display=swap');
-    html, body, [class*="css"]  {
+
+    .stApp {{
+        background-image: url("data:image/gif;base64,{encoded_gif}");
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+    }}
+
+    .stApp::before {{
+        content: "";
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background-color: rgba(255,255,255,0.25);
+        z-index: -1;
+    }}
+
+    html, body, [class*="css"] {{
         font-family: 'Orbitron', sans-serif;
-        background: linear-gradient(-45deg, #000000, #660099);
-        background-size: 400% 400%;
-        animation: gradient 15s ease infinite;
-        color: white;
-    }
-    @keyframes gradient {
-        0% {background-position: 0% 50%;}
-        50% {background-position: 100% 50%;}
-        100% {background-position: 0% 50%;}
-    }
+        color: #1e0033;
+    }}
+
+    h1, h2, h3, h4, h5, h6 {{
+        color: #4b0082 !important;
+    }}
+
+    section[data-testid="stSidebar"] {{
+        background: linear-gradient(135deg, #ffffff, #e0ccff) !important;
+        color: #1e0033 !important;
+    }}
+
+    section[data-testid="stSidebar"] h1, 
+    section[data-testid="stSidebar"] .css-1cpxqw2 {{
+        color: #4b0082 !important;
+    }}
+
+    button {{
+        background-color: #a066d0 !important;
+        color: white !important;
+        border-radius: 10px !important;
+        border: none;
+    }}
+
+    button:hover {{
+        background-color: #7e4ca1 !important;
+    }}
+
+    .st-expander {{
+        background-color: #f6efff !important;
+        border-left: 4px solid #a066d0;
+        color: #1e0033 !important;
+    }}
+
+    .stAlert-success {{
+        background-color: #e6ffed !important;
+        color: #155724 !important;
+        border-left: 4px solid #28a745 !important;
+    }}
+
+    .stAlert-info {{
+        background-color: #edf7ff !important;
+        color: #0c5460 !important;
+        border-left: 4px solid #17a2b8 !important;
+    }}
+
+    .stAlert-error {{
+        background-color: #fff1f1 !important;
+        color: #721c24 !important;
+        border-left: 4px solid #dc3545 !important;
+    }}
+
+    .stTextInput > div > div > input,
+    .stNumberInput input {{
+        background-color: #ffffff !important;
+        color: #1e0033 !important;
+        border-radius: 8px !important;
+        border: 1px solid #ccc !important;
+    }}
+
+    .tentang-kami {{
+        line-height: 1.9;
+        font-weight: bold;
+        font-size: 16px;
+        color: #1e0033;
+        padding: 1rem 2rem;
+        border-radius: 12px;
+        background-color: rgba(255, 255, 255, 0.4);
+        backdrop-filter: blur(6px);
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    }}
+
+    .tentang-kami em {{
+        font-style: italic;
+        font-weight: normal;
+        color: #4b0082;
+    }}
     </style>
 """, unsafe_allow_html=True)
 
@@ -92,10 +183,6 @@ def hitung_mr(rumus):
     total = sum(periodik[el] * jumlah for el, jumlah in komposisi.items())
     return round(total, 3), komposisi
 
-def hitung_standarisasi(mg_baku_primer, BE_or_BM, volume_mL, Fp=1):
-    if BE_or_BM == 0 or volume_mL == 0:
-        raise ValueError("BE/BM dan volume mL harus lebih besar dari nol.")
-    return mg_baku_primer / (Fp * BE_or_BM * volume_mL)
 
 # Untuk tombol navigasi: pakai session_state
 if 'page' not in st.session_state:
@@ -110,8 +197,6 @@ with st.sidebar:
         st.session_state['page'] = "Penimbangan"
     if st.button("Pengenceran"):
         st.session_state['page'] = "Pengenceran"
-    if st.button("Standarisasi"):
-        st.session_state['page'] = "Standarisasi"
     if st.button("Atom Relatif"):
         st.session_state['page'] = "Atom Relatif"
     if st.button("Tentang Kami"):
@@ -232,21 +317,6 @@ elif page == "Standarisasi":
 
     jenis = st.radio("Jenis perhitungan:", ["Normalitas (N)", "Molaritas (M)"])
 
-    if st.button("Hitung Standarisasi"):
-        try:
-            if jenis == "Normalitas (N)":
-                hasil = hitung_standarisasi(mg_baku_primer, BE, volume_ml)
-                st.success(f"Normalitas (N) = {hasil:.6f} grek/L")
-                st.info(f"Rumus: N = mg baku primer / (BE × Volume mL) dengan BE = Mr / Valensi = {BE:.3f}")
-
-            else:
-                hasil = hitung_standarisasi(mg_baku_primer, BM, volume_ml)
-                st.success(f"Molaritas (M) = {hasil:.6f} mol/L")
-                st.info(f"Rumus: M = mg baku primer / (BM × Volume mL) dengan BM = Mr = {BM:.3f}")
-
-        except Exception as e:
-            st.error(str(e))
-
 elif page == "Atom Relatif":
     st.header("Perhitungan Mr (Berat Molekul Relatif)")
     rumus = st.text_input("Masukkan rumus molekul (contoh: H2SO4, KMnO4, NaCl)")
@@ -263,8 +333,37 @@ elif page == "Atom Relatif":
 elif page == "Tentang Kami":
     st.header("Tentang Kami")
     st.markdown("""
-    **COC - Calculate Of Concentration**  
-    Dikembangkan untuk mempermudah perhitungan kimia larutan.  
-    Diperuntukkan untuk mahasiswa kimia, laboran, dan praktisi kimia.  
-    Dibuat oleh Regant Tegar (AI Assisted)  
-    """)
+    <div class="tentang-kami">
+
+    🧪 <strong>COC - Calculate Of Concentration</strong><br>
+    Aplikasi interaktif berbasis web yang dirancang untuk membantu pengguna, khususnya mahasiswa, laboran, dan praktisi kimia, dalam melakukan berbagai perhitungan larutan secara cepat dan akurat.
+
+    🔍 <strong>Fitur-fitur Utama:</strong><br>
+    1. ⚖️ Penimbangan berdasarkan berbagai satuan konsentrasi (Molaritas, Normalitas, PPM, PPB, dan % (b/v))<br>
+    2. 💧 Perhitungan pengenceran larutan<br>
+    3. 🧬 Perhitungan berat molekul relatif (Mr)<br>
+    4. 📊 Informasi valensi dan berat ekivalen berbagai senyawa
+
+    💡 <strong>Aplikasi ini sangat membantu</strong> dalam proses pembelajaran kimia, khususnya dalam materi stoikiometri dan kimia analitik, serta mendukung kegiatan laboratorium agar lebih efisien dan presisi.
+
+    <hr style="border: none; border-top: 2px dashed #a066d0; margin: 30px 0;">
+
+    👨‍💻 <strong>Tim Pengembang</strong><br>
+    Aplikasi ini merupakan hasil Proyek Tugas Website untuk mata kuliah Logika Pemrograman Komputer.
+
+    👥 <strong>Anggota Kelompok:</strong><br>
+    - 🧑‍🔬 Andi Muhammad Tegar A. A. — 2460322<br>
+    - 👩‍🔬 Inezza Azmi Tobri — 2460390<br>
+    - 🧑‍🔬 Muhammad Habibie Rasyha — 2460438<br>
+    - 👩‍🔬 Saskia Putri Irfani — 2460512<br>
+    - 👩‍🔬 Zahra Nandya Putri Nugraha — 2460543
+                    
+    <strong>Kelas:</strong> 1D<br>
+    🎓 <strong>Program Studi:</strong> Analisis Kimia<br>
+    🏛️ <strong>Politeknik AKA Bogor</strong>
+
+    <br>
+    <em>“Kimia bukan sekadar teori, tapi juga hitungan pasti. Dengan COC, hitung jadi mudah!”</em> ✨
+
+    </div>
+    """, unsafe_allow_html=True)
